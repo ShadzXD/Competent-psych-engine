@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Created with Funkin Packer v0.1.3 https://neeeoo.github.io/funkin-packer/
+-->
+<TextureAtlas imagePath="texture.png" width="1554" height="238">
+	<SubTexture name="splash10000" x="960" y="0" width="151.20000000000002" height="216.8" frameX="-25.6" frameY="-8.8" frameWidth="208.8" frameHeight="238.4"/>
+	<SubTexture name="splash10001" x="772.8000000000001" y="0" width="171.20000000000002" height="212.8" frameX="-21.6" frameY="-16.8" frameWidth="208.8" frameHeight="238.4"/>
+	<SubTexture name="splash10002" x="1127.2" y="0" width="201.60000000000002" height="232.8" frameX="-3.2" frameY="-4.800000000000001" frameWidth="208.8" frameHeight="238.4"/>
+	<SubTexture name="splash10003" x="1344.8000000000002" y="0" width="208.8" height="238.4" frameX="-0" frameY="-0" frameWidth="208.8" frameHeight="238.4"/>
+	<SubTexture name="splash20000" x="0" y="0" width="136" height="161.60000000000002" frameX="-35.2" frameY="-32.800000000000004" frameWidth="219.20000000000002" frameHeight="214.4"/>
+	<SubTexture name="splash20001" x="152" y="0" width="181.60000000000002" height="190.4" frameX="-15.200000000000001" frameY="-16" frameWidth="219.20000000000002" frameHeight="214.4"/>
+	<SubTexture name="splash20002" x="349.6" y="0" width="212" height="206.4" frameX="-0" frameY="-8" frameWidth="219.20000000000002" frameHeight="214.4"/>
+	<SubTexture name="splash20003" x="577.6" y="0" width="179.20000000000002" height="206.4" frameX="-40" frameY="-0" frameWidth="219.20000000000002" frameHeight="214.4"/>
+</TextureAtlas>
