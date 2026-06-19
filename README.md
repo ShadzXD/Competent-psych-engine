@@ -1,3 +1,13 @@
+COMPETENT PSYCH ENGINE 
+
+Contributors:
+===========
+[ashley](https://x.com/superinky_) - Fixed RGB Shader
+
+Special Thanks:
+===========
+[Troll Engine](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds sound effect
+
 My Personal Psych Engine v1.0.4 Fork made for fun.
 
 Aims to fix bugs with base Psych Engine and keep parity for the most part.
@@ -28,10 +38,4 @@ New Features
 - Added Sustain Splashes from Base Game
 - And alot more!
 
-Contributors:
-===========
-[ashley](https://x.com/superinky_) - Fixed UpdateScore() function not being called on LUA.
 
-Special Thanks:
-===========
-[Troll Engine](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds sound effect
