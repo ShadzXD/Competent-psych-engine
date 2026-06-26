@@ -6,8 +6,7 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets;
 import haxe.Json;
 import backend.Song;
-import animate.FlxAnimate;
-import animate.FlxAnimateFrames;
+import backend.FunkinSprite;
 
 typedef CharacterFile =
 {
@@ -37,7 +36,7 @@ typedef AnimArray =
 	var offsets:Array<Int>;
 }
 
-class Character extends FlxAnimate
+class Character extends FunkinSprite
 {
 	/**
 	 * In case a character is missing, it will use this on its place
@@ -84,8 +83,6 @@ class Character extends FlxAnimate
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
 	{
 		super(x, y);
-
-		anim = new animate.FlxAnimateController(this);
 
 		animOffsets = new Map<String, Array<Dynamic>>();
 		this.isPlayer = isPlayer;
@@ -158,7 +155,7 @@ class Character extends FlxAnimate
 		if (FileSystem.exists(atlastoFind))
 		#else
 		if (Assets.exists(atlastoFind))
-		#end			
+		#end
 		isAnimateAtlas = true;
 
 		scale.set(1, 1);

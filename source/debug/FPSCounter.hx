@@ -4,7 +4,7 @@ import flixel.FlxG;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.system.System;
-import flixel.util.FlxStringUtil;
+import util.MemoryUtil;
 
 /**
 	The FPS class provides an easy-to-use monitor to display
@@ -40,7 +40,6 @@ class FPSCounter extends TextField
 		defaultTextFormat = new TextFormat("VCR OSD Mono", 14, color);
 		autoSize = LEFT;
 		multiline = true;
-		text = "FPS: ";
 
 		times = [];
 	}
@@ -50,6 +49,8 @@ class FPSCounter extends TextField
 	// Event Handlers
 	private override function __enterFrame(deltaTime:Float):Void
 	{
+		if(!visible)
+			return;
 		// prevents the overlay from updating every frame, why would you need to anyways
 		if (deltaTimeout > 1000)
 		{
@@ -75,8 +76,8 @@ class FPSCounter extends TextField
 
 		text = 'FPS: ${currentFPS} / '
 			+ ClientPrefs.data.framerate
-			+ '\nMemory: ${FlxStringUtil.formatBytes(memoryMegas)} / ${FlxStringUtil.formatBytes(memoryPeak)}'
-			+ '\nPress F3 to hide.';
+		#if sys
+			+ '\nMemory: ${MemoryUtil.formatMemory(memoryMegas)} / ${MemoryUtil.formatMemory(memoryPeak)}'#end;
 		textColor = 0xFFFFFFFF;
 
 		if (currentFPS < FlxG.drawFramerate * 0.5)
