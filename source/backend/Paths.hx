@@ -507,4 +507,13 @@ class Paths
 		var path:String = getPath('images/' + key);
 		return animate.FlxAnimateFrames.fromAnimate(path);
 	}
+
+	inline static public function parseJson(path:String):Json
+	{
+		#if MODS_ALLOWED
+		return Json.parse(File.getContent(path));
+		#else
+		return Json.parse(Assets.getText(path));
+		#end
+	}
 }

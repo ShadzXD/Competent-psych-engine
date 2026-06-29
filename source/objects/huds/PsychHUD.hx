@@ -123,9 +123,6 @@ class PsychHUD extends MainHUD
 		scoreText.text = tempScore;
 	}
 
-	override public function botplayStuff()
-		scoreText.text = '[BOTPLAY]';
-
 	override public function doScoreBop():Void
 	{
 		if (scoreTxtTween != null)

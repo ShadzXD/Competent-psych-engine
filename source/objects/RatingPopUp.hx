@@ -2,20 +2,38 @@ package objects;
 
 import flixel.group.FlxGroup.FlxTypedGroup;
 import backend.Rating;
-using StringTools;
+import haxe.Json;
+
+typedef RatingFile =
+{
+	var path_prefix:String;
+	var antialiasing:Bool;
+	var rating_scale:Float;
+	var numbers_scale:Float;
+	@:optional var path_suffix:String;
+}
+
+/**
+ * Class for the rating popup when hitting a note.
+ */
 class RatingPopUp extends FlxTypedGroup<FlxSprite>
 {
-	var antialias:Bool = true;
+	var antialiasing:Bool = true;
 	var placement:Float;
 	var uiPrefix:String = '';
 	var uiSuffix:String = '';
+
 	public var hudType:String;
-	var size:Float = 0.6;
+
+	var ratingScale:Float = 0.6;
+	var numScale:Float = 0.7;
+
 	var speedRate:Float = 1;
 	var ratingsData:Array<Rating> = Rating.loadDefault();
 	var isBotplay:Bool = false;
+
 	// Stores Ratings and Combo Sprites in a group
-	override public function new(hud:String, ?fromPlayState:Bool = false, ?botplay:Bool = false)
+	override public function new(hud:String, ?shouldDisappear:Bool = true)
 	{
 		super();
 
@@ -23,13 +41,18 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 
 		hudType = hud;
 
-		if(PlayState.isPixelStage) hudType = 'PIXEL';
+		// if (fromPlayState)
+		//	speedRate = PlayState.instance.playbackRate;
+		var path:String = Paths.getPath('data/popups/' + hud + '.json', TEXT, null, true);
 
-		
-		if(fromPlayState)speedRate = PlayState.instance.playbackRate;
-
-		isBotplay = botplay;
-		loadStuff();
+		try
+		{
+			loadJsonFile(Json.parse(File.getContent(path)));
+		}
+		catch (e:Dynamic)
+		{
+			trace('Error loading popop file of "$hud": $e');
+		}
 	}
 
 	public function displayRating(daRating:String)
@@ -44,12 +67,12 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		rating.velocity.x -= FlxG.random.int(0, 10) * speedRate;
 		rating.x += ClientPrefs.data.comboOffset[0];
 		rating.y -= ClientPrefs.data.comboOffset[1];
-		rating.antialiasing = antialias;
+		rating.antialiasing = antialiasing;
 
-		rating.setGraphicSize(Std.int(rating.width * size));
+		rating.setGraphicSize(Std.int(rating.width * ratingScale));
 		rating.updateHitbox();
 		add(rating);
-		
+
 		FlxTween.tween(rating, {alpha: 0}, 0.2 / speedRate, {
 			onComplete: function(tween:FlxTween)
 			{
@@ -59,11 +82,22 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		});
 	}
 
+	public function loadJsonFile(json:Dynamic)
+	{
+		uiPrefix = 'popups/' + json.path_prefix;
+		numScale = json.numbers_scale;
+		ratingScale = json.rating_scale;
+
+		antialiasing = json.antialiasing;
+		uiSuffix = json.pathSuffix != null ? json.path_suffix : '';
+	}
+
 	public function displayCombo(?combo:Int = 0)
 	{
 		var seperatedScore:Array<Int> = [];
 
-		if(combo >= 1000) {
+		if (combo >= 1000)
+		{
 			seperatedScore.push(Math.floor(combo / 1000) % 10);
 		}
 		seperatedScore.push(Math.floor(combo / 100) % 10);
@@ -80,13 +114,13 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 			numScore.x = placement + (43 * daLoop) - 90 + ClientPrefs.data.comboOffset[2];
 			numScore.y += 80 - ClientPrefs.data.comboOffset[3];
 
-			numScore.setGraphicSize(Std.int(numScore.width * (size - 0.1)));
+			numScore.setGraphicSize(Std.int(numScore.width * (numScale - 0.1)));
 			numScore.updateHitbox();
 
 			numScore.acceleration.y = FlxG.random.int(200, 300) * speedRate * speedRate;
 			numScore.velocity.y -= FlxG.random.int(140, 160) * speedRate;
 			numScore.velocity.x = FlxG.random.float(-5, 5) * speedRate;
-			numScore.antialiasing = antialias;
+			numScore.antialiasing = antialiasing;
 			add(numScore);
 
 			FlxTween.tween(numScore, {alpha: 0}, 0.2 / speedRate, {
@@ -98,37 +132,36 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 			});
 
 			daLoop++;
-			if(numScore.x > xThing) xThing = numScore.x;
+			if (numScore.x > xThing)
+				xThing = numScore.x;
 		}
 	}
 
-	public function loadStuff()
-	{
-		switch(hudType)
+	/*
+		public function loadStuff()
 		{
-			case 'FUNKIN':
-			uiPrefix = 'ratingPopups/funkin/';
+			switch (hudType)
+			{
+				case 'FUNKIN':
+					uiPrefix = 'ratingPopups/funkin/';
 
-			case 'PIXEL':
-			uiPrefix = 'pixelUI/';
-			uiSuffix = '-pixel';
-			size = 5;
-			antialias = false;
+				case 'PIXEL':
+					uiPrefix = 'pixelUI/';
+					uiSuffix = '-pixel';
+					size = 5;
+					antialias = false;
 
-			case 'OSHA':
-			uiPrefix = 'popups/oshawott/';
-			antialias = false;
+				case 'OSHA':
+					uiPrefix = 'popups/oshawott/';
+					antialias = false;
 
-			case 'COCOON':
-			uiPrefix = 'popups/cocoon/';
-			antialias = false;
-
+				case 'COCOON':
+					uiPrefix = 'popups/cocoon/';
+					antialias = false;
+			}
+			antialias = antialias && ClientPrefs.data.antialiasing;
 		}
-		antialias = antialias && ClientPrefs.data.antialiasing;
-
-		if(!isBotplay) cachePopUpScore();
-	}
-
+	 */
 	private function cachePopUpScore()
 	{
 		trace('precaching');

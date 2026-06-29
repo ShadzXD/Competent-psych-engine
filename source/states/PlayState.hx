@@ -594,7 +594,7 @@ class PlayState extends MusicBeatState
 
 		resetRPC();
 
-		ratingClass = new RatingPopUp('FUNKIN', true, cpuControlled);
+		ratingClass = new RatingPopUp('funkin', true);
 		ratingClass.cameras = [camHUD];
 		ratingClass.visible = !ClientPrefs.data.hideHud;
 		add(ratingClass);

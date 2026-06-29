@@ -5,6 +5,9 @@ import animate.FlxAnimateFrames;
 
 enum AnimateTypes
 {
+	symbol;
+	timeline;
+	framelabel;
 }
 
 class FunkinSprite extends FlxAnimate
