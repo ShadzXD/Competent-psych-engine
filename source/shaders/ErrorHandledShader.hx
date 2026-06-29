@@ -28,7 +28,7 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 			return null;
 		}
 	}
-	
+
 	public static function crashSave(shaderName:String, error:Dynamic, onError:Dynamic) // prevent the app from dying immediately
 	{
 		if(shaderName == null) shaderName = 'unnamed';
@@ -40,13 +40,14 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 		// Save a crash log on Release builds
 		var errMsg:String = "";
 		var dateNow:String = Date.now().toString().replace(" ", "_").replace(":", "'");
-
+		#if sys
 		if (!FileSystem.exists('./crash/'))
 			FileSystem.createDirectory('./crash/');
 
 		var crashLogPath:String = './crash/shader_${shaderName}_${dateNow}.txt';
 		File.saveContent(crashLogPath, error);
 		Application.current.window.alert('Error log saved at: $crashLogPath', alertTitle);
+		#end
 		#else
 		Application.current.window.alert('Error logs aren\'t created on debug builds, check the trace log instead.', alertTitle);
 		#end

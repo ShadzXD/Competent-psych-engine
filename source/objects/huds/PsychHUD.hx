@@ -123,6 +123,13 @@ class PsychHUD extends MainHUD
 		scoreText.text = tempScore;
 	}
 
+	override public function botplayStuff()
+	{
+		// took this from doido teehee
+		scoreText.text = 'SCORE WONT SAVE';
+		scoreText.color = FlxColor.RED;
+	}
+
 	override public function doScoreBop():Void
 	{
 		if (scoreTxtTween != null)

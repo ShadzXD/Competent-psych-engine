@@ -1,6 +1,7 @@
 package options;
 
 import objects.Alphabet;
+import options.Option;
 
 class VisualsSettingsSubState extends BaseOptionsMenu
 {
@@ -58,11 +59,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		var option:Option = new Option('Combo Stacking',
 			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read", 'comboStacking', BOOL);
 		addOption(option);
-
+		//this doesnt even work on win 11 im pretty sure
+		#if windows
 		var option:Option = new Option('Window Dark Mode', "If unchecked, Game Window will be light mode (Requires game restart)", 'windowDarkMode', BOOL);
 		addOption(option);
+		#end
 
-		
 		super();
 	}
 }

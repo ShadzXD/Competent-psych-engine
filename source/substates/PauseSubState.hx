@@ -168,7 +168,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function close()
 	{
-		PlayState.instance.getGameplaySettings();
+		PlayState.instance.updateGameplayModifiers();
 		super.close();
 	}
 

@@ -49,7 +49,7 @@ class FPSCounter extends TextField
 	// Event Handlers
 	private override function __enterFrame(deltaTime:Float):Void
 	{
-		if(!visible)
+		if (!visible)
 			return;
 		// prevents the overlay from updating every frame, why would you need to anyways
 		if (deltaTimeout > 1000)
@@ -74,10 +74,8 @@ class FPSCounter extends TextField
 		if (memoryMegas >= memoryPeak)
 			memoryPeak = memoryMegas;
 
-		text = 'FPS: ${currentFPS} / '
-			+ ClientPrefs.data.framerate
-		#if sys
-			+ '\nMemory: ${MemoryUtil.formatMemory(memoryMegas)} / ${MemoryUtil.formatMemory(memoryPeak)}'#end;
+		text = 'FPS: ${currentFPS} / ' + ClientPrefs.data.framerate
+		#if sys + '\nMemory: ${MemoryUtil.formatMemory(memoryMegas)} / ${MemoryUtil.formatMemory(memoryPeak)}' #end;
 		textColor = 0xFFFFFFFF;
 
 		if (currentFPS < FlxG.drawFramerate * 0.5)
@@ -88,6 +86,10 @@ class FPSCounter extends TextField
 
 	inline function get_memoryMegas():Float
 	{
+		#if desktop
 		return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+		#else
+		return -1;
+		#end
 	}
 }

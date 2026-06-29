@@ -30,8 +30,7 @@
 	<define name="MULTITHREADED_LOADING"  if="desktop"/>
 	<define name="SHOW_LOADING_SCREEN" />
 	<define name="BASE_GAME_FILES" />
-
-	<define name="VIDEOS_ALLOWED" unless="32bits"/> <!-- IF YOU WANT TO USE VIDEOS ON YOUR SOURCE MOD, GET THIS LINE OUTSIDE OF THE SECTION -->
+	<define name="VIDEOS_ALLOWED" unless ="32bits"/>
 
 	<!-- ____________________________ Window Settings ___________________________ -->
 
@@ -102,7 +101,7 @@
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="hscript-iris" if="HSCRIPT_ALLOWED"/>
-	<haxelib name="hxvlc" if="VIDEOS_ALLOWED"/>
+	<haxelib name="hxvlc" unless="html5"/>
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
 	<haxelib name="flixel-animate"/>
 

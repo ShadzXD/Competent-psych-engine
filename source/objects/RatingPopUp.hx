@@ -47,7 +47,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 
 		try
 		{
-			loadJsonFile(Json.parse(File.getContent(path)));
+			loadJsonFile(Json.parse(Paths.getContent(path)));
 		}
 		catch (e:Dynamic)
 		{

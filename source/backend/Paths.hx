@@ -21,8 +21,8 @@ import backend.Mods;
 @:access(openfl.display.BitmapData)
 class Paths
 {
-	inline public static var SOUND_EXT = "ogg";
-	inline public static var VIDEO_EXT = "mp4";
+	inline public static final SOUND_EXT = #if html5 "mp3" #else"ogg"#end;
+	inline public static final VIDEO_EXT = "mp4";
 
 	public static function excludeAsset(key:String)
 	{
@@ -416,7 +416,7 @@ class Paths
 
 		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, (jsonExists ? File.getContent(json) : getPath('images/$key' + '.json', TEXT, parentFolder)));
 		#else
-		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, 'images/$key' + '.json', TEXT, parentFolder);
+		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, getPath('images/$key' + '.json', TEXT, parentFolder));
 		#end
 	}
 
@@ -516,4 +516,20 @@ class Paths
 		return Json.parse(Assets.getText(path));
 		#end
 	}
+	/**
+	 * Get Content that works on non sys targets
+	 * @param key
+	 * @param ignoreMods
+	 * @return String
+	 */
+	inline static public function getContent(key:String, ?ignoreMods:Bool = false):String
+	{
+		var path:String = getPath(key, TEXT, !ignoreMods);
+		#if sys
+		return (FileSystem.exists(path)) ? File.getContent(path) : null;
+		#else
+		return (OpenFlAssets.exists(path, TEXT)) ? Assets.getText(path) : null;
+		#end
+	}
+
 }

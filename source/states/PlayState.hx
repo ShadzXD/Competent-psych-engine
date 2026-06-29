@@ -186,8 +186,7 @@ class PlayState extends MusicBeatState
 	public var practiceMode:Bool = false;
 	public var pressMissDamage:Float = 0.05;
 
-	public var botplaySine:Float = 0;
-	public var botplayTxt:FlxText;
+	public var botplayText:FlxText;
 
 	public var camPreHUD:FlxCamera;
 	public var camHUD:FlxCamera;
@@ -298,8 +297,8 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 		if (!isStoryMode)
 		{
-			// Gameplay settings
-			getGameplaySettings();
+			// Gameplay modifiers
+			updateGameplayModifiers();
 		}
 
 		// var gameCam:FlxCamera = FlxG.camera;
@@ -444,7 +443,7 @@ class PlayState extends MusicBeatState
 			add(dadGroup);
 			add(boyfriendGroup);
 		}
-
+		#if sys
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		// "SCRIPTS FOLDER" SCRIPTS
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'scripts/'))
@@ -461,7 +460,7 @@ class PlayState extends MusicBeatState
 				#end
 			}
 		#end
-
+		#end
 		var camPos:FlxPoint = FlxPoint.get(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
 		if (gf != null)
 		{
@@ -493,6 +492,14 @@ class PlayState extends MusicBeatState
 		hudClass.visible = !ClientPrefs.data.hideHud;
 		useHealth = hudClass.useHealth;
 		add(hudClass);
+
+		botplayText = new FlxText(400, FlxG.height - 250, FlxG.width - 800, "[BOTPLAY]", 32);
+		botplayText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayText.scrollFactor.set();
+		botplayText.borderSize = 1.25;
+		botplayText.visible = cpuControlled;
+		botplayText.cameras = [camHUD];
+		add(botplayText);
 
 		noteGroup = new FlxTypedGroup<FlxBasic>();
 		comboGroup = new FlxSpriteGroup();
@@ -550,6 +557,7 @@ class PlayState extends MusicBeatState
 		eventsPushed = null;
 
 		// SONG SPECIFIC SCRIPTS
+		#if sys
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/'))
 			for (file in FileSystem.readDirectory(folder))
@@ -565,6 +573,10 @@ class PlayState extends MusicBeatState
 				#end
 			}
 		#end
+		#else
+		FlxG.log.warn("no script support for html5");
+		#end
+
 
 		if (eventNotes.length > 0)
 		{
@@ -663,7 +675,7 @@ class PlayState extends MusicBeatState
 		FlxG.animationTimeScale = value;
 		Conductor.offset = Reflect.hasField(PlayState.SONG, 'offset') ? (PlayState.SONG.offset / value) : 0;
 		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
-		#if VIDEOS_ALLOWED
+		#if hxvlc
 		if (videoCutscene != null && videoCutscene.videoSprite != null)
 			videoCutscene.videoSprite.bitmap.rate = value;
 		#end
@@ -689,8 +701,9 @@ class PlayState extends MusicBeatState
 			spr.y += newText.height + 2;
 		});
 		luaDebugGroup.add(newText);
-
+		#if sys
 		Sys.println(text);
+		#end
 	}
 	#end
 
@@ -741,7 +754,7 @@ class PlayState extends MusicBeatState
 		var luaFile:String = 'characters/$name.lua';
 		#if MODS_ALLOWED
 		var replacePath:String = Paths.modFolders(luaFile);
-		if (FileSystem.exists(replacePath))
+		if (Paths.fileExists(replacePath))
 		{
 			luaFile = replacePath;
 			doPush = true;
@@ -749,7 +762,7 @@ class PlayState extends MusicBeatState
 		else
 		{
 			luaFile = Paths.getSharedPath(luaFile);
-			if (FileSystem.exists(luaFile))
+			if (Paths.fileExists(luaFile))
 				doPush = true;
 		}
 		#else
@@ -779,7 +792,7 @@ class PlayState extends MusicBeatState
 		var scriptFile:String = 'characters/' + name + '.hx';
 		#if MODS_ALLOWED
 		var replacePath:String = Paths.modFolders(scriptFile);
-		if (FileSystem.exists(replacePath))
+		if (Paths.fileExists(replacePath, TEXT))
 		{
 			scriptFile = replacePath;
 			doPush = true;
@@ -788,7 +801,7 @@ class PlayState extends MusicBeatState
 		#end
 		{
 			scriptFile = Paths.getSharedPath(scriptFile);
-			if (FileSystem.exists(scriptFile))
+			if (Paths.fileExists(scriptFile, TEXT))
 				doPush = true;
 		}
 
@@ -829,7 +842,7 @@ class PlayState extends MusicBeatState
 		var fileName:String = Paths.video(name);
 
 		#if sys
-		if (FileSystem.exists(fileName))
+		if (Paths.fileExists(fileName))
 		#else
 		if (OpenFlAssets.exists(fileName))
 		#end
@@ -841,7 +854,9 @@ class PlayState extends MusicBeatState
 			if (forMidSong)
 			{
 				videoCutscene.cameras = [camPreHUD];
+				#if hxvlc
 				videoCutscene.videoSprite.bitmap.rate = playbackRate;
+				#end
 			}
 
 			// Finish callback
@@ -870,9 +885,10 @@ class PlayState extends MusicBeatState
 				GameOverSubstate.instance.add(videoCutscene);
 			else
 				add(videoCutscene);
-
+			#if hxvlc
 			if (playOnLoad)
 				videoCutscene.play();
+			#end
 			return videoCutscene;
 		}
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
@@ -1534,7 +1550,7 @@ class PlayState extends MusicBeatState
 					}
 				 */
 				#if hxvlc
-				// videoCutscene.play();
+				 videoCutscene.play();
 				startVideo(event.value1, true, false, false, false);
 				trace('pre-loaded ' + event.value1);
 				#end
@@ -1545,7 +1561,7 @@ class PlayState extends MusicBeatState
 	function eventEarlyTrigger(event:EventNote):Float
 	{
 		var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true);
-		if (returnedValue != null && returnedValue != 0)
+		if (returnedValue != null && returnedValue != 0 && returnedValue != LuaUtils.Function_Continue)
 		{
 			return returnedValue;
 		}
@@ -1659,8 +1675,9 @@ class PlayState extends MusicBeatState
 		stagesFunc(function(stage:BaseStage) stage.closeSubState());
 		if (paused)
 		{
+			#if hxvlc
 			videoCutscene?.resume();
-
+			#end
 			if (FlxG.sound.music != null && !startingSong && canResync)
 			{
 				resyncVocals();
@@ -1782,11 +1799,6 @@ class PlayState extends MusicBeatState
 
 		setOnScripts('curDecStep', curDecStep);
 		setOnScripts('curDecBeat', curDecBeat);
-		if (botplayTxt != null && botplayTxt.visible)
-		{
-			botplaySine += 180 * elapsed;
-			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
-		}
 
 		if (controls.PAUSE && startedCountdown && canPause)
 		{
@@ -1993,7 +2005,9 @@ class PlayState extends MusicBeatState
 		persistentUpdate = false;
 		persistentDraw = true;
 		paused = true;
+		#if VIDEOS_ALLOWED
 		videoCutscene?.pause();
+		#end
 		if (FlxG.sound.music != null)
 		{
 			FlxG.sound.music.pause();
@@ -3432,10 +3446,10 @@ class PlayState extends MusicBeatState
 	{
 		#if MODS_ALLOWED
 		var luaToLoad:String = Paths.modFolders(luaFile);
-		if (!FileSystem.exists(luaToLoad))
+		if (!Paths.fileExists(luaToLoad))
 			luaToLoad = Paths.getSharedPath(luaFile);
 
-		if (FileSystem.exists(luaToLoad))
+		if (Paths.fileExists(luaToLoad))
 		#elseif sys
 		var luaToLoad:String = Paths.getSharedPath(luaFile);
 		if (OpenFlAssets.exists(luaToLoad))
@@ -3457,13 +3471,13 @@ class PlayState extends MusicBeatState
 	{
 		#if MODS_ALLOWED
 		var scriptToLoad:String = Paths.modFolders(scriptFile);
-		if (!FileSystem.exists(scriptToLoad))
+		if (!Paths.fileExists(scriptToLoad))
 			scriptToLoad = Paths.getSharedPath(scriptFile);
 		#else
 		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
 		#end
 
-		if (FileSystem.exists(scriptToLoad))
+		if (Paths.fileExists(scriptToLoad, TEXT))
 		{
 			if (Iris.instances.exists(scriptToLoad))
 				return false;
@@ -3796,7 +3810,7 @@ class PlayState extends MusicBeatState
 			var frag:String = folder + name + '.frag';
 			var vert:String = folder + name + '.vert';
 			var found:Bool = false;
-			if (FileSystem.exists(frag))
+			if (Paths.fileExists(frag))
 			{
 				frag = File.getContent(frag);
 				found = true;
@@ -3804,7 +3818,7 @@ class PlayState extends MusicBeatState
 			else
 				frag = null;
 
-			if (FileSystem.exists(vert))
+			if (Paths.fileExists(vert))
 			{
 				vert = File.getContent(vert);
 				found = true;
@@ -3830,12 +3844,19 @@ class PlayState extends MusicBeatState
 		return false;
 	}
 
-	public function getGameplaySettings()
+	public function updateGameplayModifiers()
 	{
 		healthGain = ClientPrefs.getGameplaySetting('healthgain');
 		healthLoss = ClientPrefs.getGameplaySetting('healthloss');
 		instakillOnMiss = ClientPrefs.getGameplaySetting('instakill');
 		practiceMode = ClientPrefs.getGameplaySetting('practice');
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay');
+		botPlayStuff();
+	}
+
+	function botPlayStuff()
+	{
+		if (botplayText != null)
+			botplayText.visible = cpuControlled;
 	}
 }

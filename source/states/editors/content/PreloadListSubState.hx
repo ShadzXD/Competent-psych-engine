@@ -22,7 +22,7 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 		this.saveCallback = saveCallback;
 		lockedList = (lockedList != null) ? locked : [];
 		preloadList = (list != null) ? list : [];
-		
+
 		for (k => v in preloadList)
 			preloadListKeys.push(k);
 
@@ -32,7 +32,7 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 	var outputTxt:FlxText;
 	var fileDialog:FileDialogHandler = new FileDialogHandler();
 	var radioGrp:PsychUIRadioGroup;
-	
+
 	var removeButton:PsychUIButton;
 	var lqCheckBox:PsychUICheckBox;
 	var hqCheckBox:PsychUICheckBox;
@@ -57,7 +57,7 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 		var btn:PsychUIButton = new PsychUIButton(bg.x + bg.width - 40, bg.y, 'X', close, 40);
 		btn.cameras = cameras;
 		add(btn);
-		
+
 		outputTxt = new FlxText(24, 640, 800, '', 24);
 		outputTxt.borderStyle = OUTLINE_FAST;
 		outputTxt.borderSize = 1;
@@ -111,6 +111,7 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 
 		function addToList(path:Path, isFolder:Bool)
 		{
+			#if sys
 			var exePath:String = Sys.getCwd().replace('\\', '/');
 			if(path.dir.startsWith(exePath))
 			{
@@ -147,19 +148,20 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 				}
 			}
 			else showOutput('File is not inside Psych Engine\'s folder!', true);
+			#end
 		}
-
+		#if sys
 		var loadFileBtn:PsychUIButton = new PsychUIButton(0, bg.y + bg.height - 40, 'Load File', function()
 		{
 			if(!fileDialog.completed) return;
-			
+
 			fileDialog.open(null, 'Load a .PNG/.OGG File...', [#if !mac new FileFilter('Image/Audio', '*.png;*.ogg') #end], function()
 			{
 				var path:Path = new Path(fileDialog.path.replace('\\', '/'));
-	
+
 				var ext:String = path.ext;
 				if(ext != null) ext = ext.toLowerCase();
-	
+
 				switch(ext)
 				{
 					case 'png', 'ogg':
@@ -200,7 +202,7 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 		saveBtn.normalStyle.bgColor = FlxColor.GREEN;
 		saveBtn.normalStyle.textColor = FlxColor.WHITE;
 		add(saveBtn);
-
+		#end
 		updateButtons();
 		super.create();
 	}
@@ -211,13 +213,14 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 
 		outputTime = Math.max(0, outputTime - elapsed);
 		outputTxt.alpha = outputTime;
+		#if sys
 		if(!fileDialog.completed) return;
-			
+		#end
 		if(controls.BACK)
 		{
 			close();
 		}
-		
+
 		var checked:PsychUIRadioItem = radioGrp.checkedRadio;
 		if(checked != null)
 			removeButton.y = checked.y - 1;
@@ -260,18 +263,18 @@ class PreloadListSubState extends MusicBeatSubstate implements PsychUIEvent
 	{
 		return (radioGrp.checkedRadio != null) ? radioGrp.checkedRadio.text.text : '';
 	}
-	
+
 	var outputTime:Float = 0;
 	function showOutput(txt:String, isError:Bool = false)
 	{
 		outputTxt.color = isError ? FlxColor.RED : FlxColor.WHITE;
 		outputTxt.text = txt;
 		outputTime = 3;
-		
+
 		if(isError) FlxG.sound.play(Paths.sound('cancelMenu'), 0.4);
 		else FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 	}
-	
+
 	override function destroy()
 	{
 		for (member in members) FlxDestroyUtil.destroy(member);

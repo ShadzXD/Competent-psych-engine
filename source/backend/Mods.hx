@@ -100,15 +100,18 @@ class Mods
 	{
 		var foldersToCheck:Array<String> = [];
 		// Main folder
+		#if sys
 		if (FileSystem.exists(path + fileToFind))
 			foldersToCheck.push(path + fileToFind);
-
+		#end
 		// Week folder
 		if (Paths.currentLevel != null && Paths.currentLevel != path)
 		{
 			var pth:String = Paths.getFolderPath(fileToFind, Paths.currentLevel);
-			if (!foldersToCheck.contains(pth) && FileSystem.exists(pth))
+			#if sys
+			if (!foldersToCheck.contains(pth) &&  FileSystem.exists(pth) )
 				foldersToCheck.push(pth);
+			#end
 		}
 
 		#if MODS_ALLOWED
