@@ -71,7 +71,6 @@ class StrumNote extends FlxSprite
 			skin = customSkin;
 
 		texture = skin; // Load texture and anims
-		scrollFactor.set();
 		playAnim('static');
 	}
 
@@ -156,8 +155,8 @@ class StrumNote extends FlxSprite
 	public function playerPosition()
 	{
 		x += Note.swagWidth * noteData;
-		x += 50;
-		x += ((FlxG.width / 2) * player);
+		x += 100;
+		// x += ((FlxG.width / 2) * player);
 	}
 
 	override function update(elapsed:Float)

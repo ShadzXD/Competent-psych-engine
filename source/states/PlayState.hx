@@ -30,6 +30,7 @@ import openfl.filters.ShaderFilter;
 import shaders.ErrorHandledShader;
 import objects.VideoSprite;
 import objects.notes.Note.EventNote;
+import objects.notes.StrumLine;
 import objects.*;
 import objects.notes.*;
 import states.stages.*;
@@ -153,6 +154,14 @@ class PlayState extends MusicBeatState
 	public var playerStrums:FlxTypedGroup<StrumNote> = new FlxTypedGroup<StrumNote>();
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash> = new FlxTypedGroup<NoteSplash>();
 	public var grpHoldSplashes:FlxTypedGroup<SustainSplash> = new FlxTypedGroup<SustainSplash>();
+
+	public var playerStrumline:StrumLine;
+
+	public var opponentStrumline:StrumLine;
+
+	public var testStrumline:StrumLine;
+
+	public var strumlines:Array<StrumLine> = [];
 
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
@@ -489,12 +498,31 @@ class PlayState extends MusicBeatState
 		startCharacterScripts(boyfriend.curCharacter);
 		#end
 
+		ratingClass = new RatingPopUp('funkin', true);
+		ratingClass.cameras = [camHUD];
+		ratingClass.visible = !ClientPrefs.data.hideHud;
+		add(ratingClass);
+
 		hudClass = new PsychHUD();
 		hudClass.cameras = [camHUD];
 		hudClass.visible = !ClientPrefs.data.hideHud;
 		useHealth = hudClass.useHealth;
 		add(hudClass);
+		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
 
+		opponentStrumline = new StrumLine(0, strumLineY, 1, 4);
+		opponentStrumline.cameras = [camHUD];
+		add(opponentStrumline);
+
+		playerStrumline = new StrumLine(650, strumLineY, 1, 4);
+		playerStrumline.cameras = [camHUD];
+		add(playerStrumline);
+
+		testStrumline = new StrumLine(400, 100, 0, 4);
+		testStrumline.cameras = [camGame];
+		testStrumline.cpuControlled = true;
+		add(testStrumline);
+		strumlines = [opponentStrumline, playerStrumline, testStrumline];
 		botplayText = new FlxText(400, FlxG.height - 250, FlxG.width - 800, "[BOTPLAY]", 32);
 		botplayText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayText.scrollFactor.set();
@@ -503,18 +531,15 @@ class PlayState extends MusicBeatState
 		add(botplayText);
 		botPlayStuff();
 		noteGroup = new FlxTypedGroup<FlxBasic>();
-		comboGroup = new FlxSpriteGroup();
-		add(comboGroup);
 		add(noteGroup);
-		add(grpHoldSplashes);
+		noteGroup.add(grpHoldSplashes);
 
 		Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
-
-		noteGroup.add(strumLineNotes);
+		add(strumLineNotes);
 
 		generateSong();
 
-		noteGroup.add(grpNoteSplashes);
+		add(grpNoteSplashes);
 
 		camFollow = new FlxObject();
 		camFollow.setPosition(camPos.x, camPos.y);
@@ -536,8 +561,6 @@ class PlayState extends MusicBeatState
 
 		noteGroup.cameras = [camHUD];
 		grpHoldSplashes.cameras = [camHUD];
-
-		comboGroup.cameras = [camHUD];
 
 		startingSong = true;
 
@@ -605,11 +628,6 @@ class PlayState extends MusicBeatState
 			Paths.music(Paths.formatToSongPath('breakfast'));
 
 		resetRPC();
-
-		ratingClass = new RatingPopUp('funkin', true);
-		ratingClass.cameras = [camHUD];
-		ratingClass.visible = !ClientPrefs.data.hideHud;
-		add(ratingClass);
 
 		stagesFunc(function(stage:BaseStage) stage.createPost());
 		callOnScripts('onCreatePost');
@@ -1010,26 +1028,29 @@ class PlayState extends MusicBeatState
 			canPause = true;
 			generateStaticArrows(0);
 			generateStaticArrows(1);
-			for (i in 0...playerStrums.length)
+
+			for (i in 0...playerStrumline.length)
 			{
-				setOnScripts('defaultPlayerStrumX' + i, playerStrums.members[i].x);
-				setOnScripts('defaultPlayerStrumY' + i, playerStrums.members[i].y);
+				setOnScripts('defaultPlayerStrumX' + i, playerStrumline.members[i].x);
+				setOnScripts('defaultPlayerStrumY' + i, playerStrumline.members[i].y);
 			}
-			for (i in 0...opponentStrums.length)
+			for (i in 0...opponentStrumline.length)
 			{
-				setOnScripts('defaultOpponentStrumX' + i, opponentStrums.members[i].x);
-				setOnScripts('defaultOpponentStrumY' + i, opponentStrums.members[i].y);
+				setOnScripts('defaultOpponentStrumX' + i, opponentStrumline.members[i].x);
+				setOnScripts('defaultOpponentStrumY' + i, opponentStrumline.members[i].y);
 				// if(ClientPrefs.data.middleScroll) opponentStrums.members[i].visible = false;
 			}
 			// this is getting reworked, ignore it for now
-			var strumUnderlay:FlxSprite = new FlxSprite(playerStrums.members[0].x - 20).makeGraphic(1, 1, FlxColor.BLACK);
-			strumUnderlay.scale.set(490, FlxG.height);
-			strumUnderlay.updateHitbox();
-			strumUnderlay.alpha = ClientPrefs.data.underlayOpacity;
-			strumUnderlay.scrollFactor.set();
-			strumUnderlay.screenCenter(Y);
-			strumUnderlay.cameras = [camPreHUD];
-			add(strumUnderlay);
+			/*
+				var strumUnderlay:FlxSprite = new FlxSprite(playerStrums.members[0].x - 20).makeGraphic(1, 1, FlxColor.BLACK);
+				strumUnderlay.scale.set(490, FlxG.height);
+				strumUnderlay.updateHitbox();
+				strumUnderlay.alpha = ClientPrefs.data.underlayOpacity;
+				strumUnderlay.scrollFactor.set();
+				strumUnderlay.screenCenter(Y);
+				strumUnderlay.cameras = [camPreHUD];
+				add(strumUnderlay);
+			 */
 			startedCountdown = true;
 			Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
 			setOnScripts('startedCountdown', true);
@@ -1603,49 +1624,6 @@ class PlayState extends MusicBeatState
 	private function generateStaticArrows(player:Int):Void
 	{
 		var strumLineX:Float = useMiddleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X;
-		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
-
-		for (i in 0...4)
-		{
-			// FlxG.log.add(i);
-			var targetAlpha:Float = 1;
-			if (player < 1)
-			{
-				if (!ClientPrefs.data.opponentStrums)
-					targetAlpha = 0;
-				else if (ClientPrefs.data.middleScroll)
-					targetAlpha = 0.35;
-			}
-
-			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
-			babyArrow.downScroll = ClientPrefs.data.downScroll;
-			if (!isStoryMode && !skipArrowStartTween)
-			{
-				// babyArrow.y -= 10;
-				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {/*y: babyArrow.y + 10,*/ alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
-			}
-			else
-				babyArrow.alpha = targetAlpha;
-
-			if (player == 1)
-				playerStrums.add(babyArrow);
-			else
-			{
-				if (ClientPrefs.data.middleScroll)
-				{
-					babyArrow.x += 310;
-					if (i > 1)
-					{ // Up and Right
-						babyArrow.x += FlxG.width / 2 + 25;
-					}
-				}
-				opponentStrums.add(babyArrow);
-			}
-
-			strumLineNotes.add(babyArrow);
-			babyArrow.playerPosition();
-		}
 	}
 
 	override function openSubState(SubState:FlxSubState)
@@ -1917,23 +1895,28 @@ class PlayState extends MusicBeatState
 							if (daNote == null)
 								continue;
 
-							var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
-							if (!daNote.mustPress)
-								strumGroup = opponentStrums;
+							var strumGroup:StrumLine = playerStrumline;
+							if (daNote.strumline != -1)
+							{
+								strumGroup = strumlines[daNote.strumline];
+							}
+							else if (!daNote.mustPress)
+								strumGroup = opponentStrumline;
+							daNote.cameras = strumGroup.cameras;
 
 							var strum:StrumNote = strumGroup.members[daNote.noteData];
 							daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
 
 							if (daNote.mustPress)
 							{
-								if (cpuControlled
+								if (strumGroup.cpuControlled
 									&& !daNote.blockHit
 									&& daNote.canBeHit
 									&& (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
-									goodNoteHit(daNote);
+									goodNoteHit(daNote, strumGroup);
 							}
 							else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
-								opponentNoteHit(daNote);
+								opponentNoteHit(daNote, strumGroup);
 
 							if (daNote.isSustainNote && strum.sustainReduce)
 								daNote.clipToStrumNote(strum);
@@ -2687,13 +2670,10 @@ class PlayState extends MusicBeatState
 
 	public var totalPlayed:Int = 0;
 	public var totalNotesHit:Float = 0.0;
-
 	public var showCombo:Bool = false;
 	public var showComboNum:Bool = true;
 	public var showRating:Bool = true;
 
-	// Stores Ratings and Combo Sprites in a group
-	public var comboGroup:FlxSpriteGroup;
 	// Stores Note Objects in a Group
 	public var noteGroup:FlxTypedGroup<FlxBasic>;
 
@@ -2713,18 +2693,6 @@ class PlayState extends MusicBeatState
 	{
 		var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset);
 		vocals.volume = 1;
-
-		if (!ClientPrefs.data.comboStacking && comboGroup.members.length > 0)
-		{
-			for (spr in comboGroup)
-			{
-				if (spr == null)
-					continue;
-
-				comboGroup.remove(spr);
-				spr.destroy();
-			}
-		}
 
 		var placement:Float = FlxG.width * 0.35;
 		var rating:FlxSprite = new FlxSprite();
@@ -2791,7 +2759,7 @@ class PlayState extends MusicBeatState
 
 	private function keyPressed(key:Int)
 	{
-		if (cpuControlled || paused || inCutscene || key < 0 || key >= playerStrums.length || !generatedMusic || endingSong || boyfriend.stunned)
+		if (cpuControlled || paused || inCutscene || key < 0 || key >= playerStrumline.length || !generatedMusic || endingSong || boyfriend.stunned)
 			return;
 
 		var ret:Dynamic = callOnScripts('onKeyPressPre', [key]);
@@ -2802,7 +2770,7 @@ class PlayState extends MusicBeatState
 		var lastTime:Float = Conductor.songPosition;
 		if (Conductor.songPosition >= 0)
 			Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
-
+		var funnyNote:Note = null;
 		// obtain notes that the player can hit
 		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool
 		{
@@ -2813,7 +2781,7 @@ class PlayState extends MusicBeatState
 
 		if (plrInputNotes.length != 0)
 		{ // slightly faster than doing `> 0` lol
-			var funnyNote:Note = plrInputNotes[0]; // front note
+			funnyNote = plrInputNotes[0]; // front note
 
 			if (plrInputNotes.length > 1)
 			{
@@ -2831,7 +2799,9 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			goodNoteHit(funnyNote);
+			var strum:StrumLine = getStrumlineNote(funnyNote);
+			if (funnyNote.strumline == -1 || funnyNote.strumline != -1 && !strum.cpuControlled)
+				goodNoteHit(funnyNote, getStrumlineNote(funnyNote));
 		}
 		else
 		{
@@ -2849,7 +2819,7 @@ class PlayState extends MusicBeatState
 		// more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)
 		Conductor.songPosition = lastTime;
 
-		var spr:StrumNote = playerStrums.members[key];
+		var spr:StrumNote = playerStrumline.members[key];
 		if (strumsBlocked[key] != true && spr != null && spr.animation.curAnim.name != 'confirm')
 		{
 			spr.playAnim('pressed');
@@ -2878,14 +2848,14 @@ class PlayState extends MusicBeatState
 
 	private function keyReleased(key:Int)
 	{
-		if (cpuControlled || !startedCountdown || paused || key < 0 || key >= playerStrums.length)
+		if (cpuControlled || !startedCountdown || paused || key < 0 || key >= playerStrumline.length)
 			return;
 
 		var ret:Dynamic = callOnScripts('onKeyReleasePre', [key]);
 		if (ret == LuaUtils.Function_Stop)
 			return;
 
-		var spr:StrumNote = playerStrums.members[key];
+		var spr:StrumNote = playerStrumline.members[key];
 		if (spr != null)
 		{
 			spr.playAnim('static');
@@ -2942,7 +2912,7 @@ class PlayState extends MusicBeatState
 						var released:Bool = !holdArray[n.noteData];
 
 						if (!released)
-							goodNoteHit(n);
+							goodNoteHit(n, getStrumlineNote(n));
 					}
 				}
 			}
@@ -3051,7 +3021,7 @@ class PlayState extends MusicBeatState
 		vocals.volume = 0;
 	}
 
-	function opponentNoteHit(note:Note):Void
+	function opponentNoteHit(note:Note, ?strumline:StrumLine):Void
 	{
 		var result:Dynamic = callOnLuas('opponentNoteHitPre', [
 			notes.members.indexOf(note),
@@ -3100,7 +3070,7 @@ class PlayState extends MusicBeatState
 
 		if (!hasOpponentVoices)
 			vocals.volume = 1;
-		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate, strumline);
 		note.hitByOpponent = true;
 		stagesFunc(function(stage:BaseStage) stage.opponentNoteHit(note));
 		var result:Dynamic = callOnLuas('opponentNoteHit', [
@@ -3111,13 +3081,13 @@ class PlayState extends MusicBeatState
 		]);
 		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 			callOnHScript('opponentNoteHit', [note]);
-		spawnHoldSplashOnNote(note);
+		// spawnHoldSplashOnNote(note);
 
 		if (!note.isSustainNote)
 			invalidateNote(note);
 	}
 
-	public function goodNoteHit(note:Note):Void
+	public function goodNoteHit(note:Note, ?strumline:StrumLine):Void
 	{
 		if (note.wasGoodHit)
 			return;
@@ -3181,15 +3151,15 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-
-			if (!cpuControlled)
+			// kind of busted but it works
+			if (!cpuControlled && note.strumline == -1)
 			{
-				var spr = playerStrums.members[note.noteData];
+				var spr = strumline.members[note.noteData];
 				if (spr != null)
 					spr.playAnim('confirm', true);
 			}
 			else
-				strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+				strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate, strumline);
 			vocals.volume = 1;
 
 			if (!note.isSustainNote)
@@ -3227,7 +3197,7 @@ class PlayState extends MusicBeatState
 			if (!note.noteSplashData.disabled && !note.isSustainNote)
 				spawnNoteSplashOnNote(note);
 		}
-		spawnHoldSplashOnNote(note);
+		// spawnHoldSplashOnNote(note);
 
 		stagesFunc(function(stage:BaseStage) stage.goodNoteHit(note));
 		var result:Dynamic = callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
@@ -3248,7 +3218,7 @@ class PlayState extends MusicBeatState
 	{
 		if (note != null)
 		{
-			var strum:StrumNote = playerStrums.members[note.noteData];
+			var strum:StrumNote = playerStrumline.members[note.noteData];
 			if (strum != null)
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note, strum);
 		}
@@ -3658,17 +3628,10 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	function strumPlayAnim(isDad:Bool, id:Int, time:Float)
+	function strumPlayAnim(isDad:Bool, id:Int, time:Float, strumline:StrumLine)
 	{
 		var spr:StrumNote = null;
-		if (isDad)
-		{
-			spr = opponentStrums.members[id];
-		}
-		else
-		{
-			spr = playerStrums.members[id];
-		}
+		spr = strumline.members[id];
 
 		if (spr != null)
 		{
@@ -3862,5 +3825,17 @@ class PlayState extends MusicBeatState
 			botplayText.visible = cpuControlled;
 		if (!wasBotplayed)
 			wasBotplayed = cpuControlled ? true : false;
+	}
+
+	/**
+	 * Returns the strumline from which the note is being hit from.
+	 * @param note
+	 * @return StrumLine
+	 */
+	public function getStrumlineNote(note:Note):StrumLine
+	{
+		if (note.strumline != -1 && note.strumline >= 0 && note.strumline < strumlines.length)
+			return strumlines[note.strumline];
+		return playerStrumline;
 	}
 }

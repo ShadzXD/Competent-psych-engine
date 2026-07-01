@@ -145,6 +145,11 @@ class Note extends FlxSprite
 
 	public var hitsoundVolume(get, default):Float = 1.0;
 
+	/**
+	 * Mess with this to use a custom strumline.
+	 */
+	public var strumline:Int = -1;
+
 	function get_hitsoundVolume():Float
 	{
 		if (ClientPrefs.data.hitsoundVolume > 0)
@@ -238,6 +243,7 @@ class Note extends FlxSprite
 					noMissAnimation = true;
 				case 'GF Sing':
 					gfNote = true;
+					strumline = 2;
 			}
 			if (value != null && value.length > 1)
 				NoteTypesConfig.applyNoteTypeData(this, value);
