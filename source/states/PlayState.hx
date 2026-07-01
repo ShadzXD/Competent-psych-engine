@@ -186,6 +186,8 @@ class PlayState extends MusicBeatState
 	public var practiceMode:Bool = false;
 	public var pressMissDamage:Float = 0.05;
 
+	private var wasBotplayed:Bool = false;
+
 	public var botplayText:FlxText;
 
 	public var camPreHUD:FlxCamera;
@@ -497,10 +499,9 @@ class PlayState extends MusicBeatState
 		botplayText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayText.scrollFactor.set();
 		botplayText.borderSize = 1.25;
-		botplayText.visible = cpuControlled;
 		botplayText.cameras = [camHUD];
 		add(botplayText);
-
+		botPlayStuff();
 		noteGroup = new FlxTypedGroup<FlxBasic>();
 		comboGroup = new FlxSpriteGroup();
 		add(comboGroup);
@@ -576,7 +577,6 @@ class PlayState extends MusicBeatState
 		#else
 		FlxG.log.warn("no script support for html5");
 		#end
-
 
 		if (eventNotes.length > 0)
 		{
@@ -754,7 +754,7 @@ class PlayState extends MusicBeatState
 		var luaFile:String = 'characters/$name.lua';
 		#if MODS_ALLOWED
 		var replacePath:String = Paths.modFolders(luaFile);
-		if (Paths.fileExists(replacePath))
+		if (Paths.exists(replacePath))
 		{
 			luaFile = replacePath;
 			doPush = true;
@@ -762,7 +762,7 @@ class PlayState extends MusicBeatState
 		else
 		{
 			luaFile = Paths.getSharedPath(luaFile);
-			if (Paths.fileExists(luaFile))
+			if (Paths.exists(luaFile))
 				doPush = true;
 		}
 		#else
@@ -792,7 +792,7 @@ class PlayState extends MusicBeatState
 		var scriptFile:String = 'characters/' + name + '.hx';
 		#if MODS_ALLOWED
 		var replacePath:String = Paths.modFolders(scriptFile);
-		if (Paths.fileExists(replacePath, TEXT))
+		if (Paths.exists(replacePath))
 		{
 			scriptFile = replacePath;
 			doPush = true;
@@ -801,7 +801,7 @@ class PlayState extends MusicBeatState
 		#end
 		{
 			scriptFile = Paths.getSharedPath(scriptFile);
-			if (Paths.fileExists(scriptFile, TEXT))
+			if (Paths.exists(scriptFile))
 				doPush = true;
 		}
 
@@ -842,7 +842,7 @@ class PlayState extends MusicBeatState
 		var fileName:String = Paths.video(name);
 
 		#if sys
-		if (Paths.fileExists(fileName))
+		if (Paths.exists(fileName))
 		#else
 		if (OpenFlAssets.exists(fileName))
 		#end
@@ -1194,6 +1194,8 @@ class PlayState extends MusicBeatState
 	// cool right? -Crow
 	public dynamic function updateScore(miss:Bool = false, scoreBop:Bool = true)
 	{
+		if (wasBotplayed)
+			return;
 		var ret:Dynamic = callOnScripts('preUpdateScore', [miss], true);
 		if (ret == LuaUtils.Function_Stop)
 			return;
@@ -1550,7 +1552,7 @@ class PlayState extends MusicBeatState
 					}
 				 */
 				#if hxvlc
-				 videoCutscene.play();
+				videoCutscene.play();
 				startVideo(event.value1, true, false, false, false);
 				trace('pre-loaded ' + event.value1);
 				#end
@@ -2741,7 +2743,7 @@ class PlayState extends MusicBeatState
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
 
-		if (!cpuControlled)
+		if (!wasBotplayed)
 		{
 			songScore += score;
 			if (!note.ratingDisabled)
@@ -3197,7 +3199,7 @@ class PlayState extends MusicBeatState
 					combo = 9999;
 				popUpScore(note);
 			}
-			if (note.isSustainNote && !cpuControlled)
+			if (note.isSustainNote && !wasBotplayed)
 			{
 				songScore += Scoring.holdNoteScore();
 				RecalculateRating(false, false);
@@ -3446,10 +3448,10 @@ class PlayState extends MusicBeatState
 	{
 		#if MODS_ALLOWED
 		var luaToLoad:String = Paths.modFolders(luaFile);
-		if (!Paths.fileExists(luaToLoad))
+		if (!Paths.exists(luaToLoad))
 			luaToLoad = Paths.getSharedPath(luaFile);
 
-		if (Paths.fileExists(luaToLoad))
+		if (Paths.exists(luaToLoad))
 		#elseif sys
 		var luaToLoad:String = Paths.getSharedPath(luaFile);
 		if (OpenFlAssets.exists(luaToLoad))
@@ -3471,13 +3473,13 @@ class PlayState extends MusicBeatState
 	{
 		#if MODS_ALLOWED
 		var scriptToLoad:String = Paths.modFolders(scriptFile);
-		if (!Paths.fileExists(scriptToLoad))
+		if (!Paths.exists(scriptToLoad))
 			scriptToLoad = Paths.getSharedPath(scriptFile);
 		#else
 		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
 		#end
 
-		if (Paths.fileExists(scriptToLoad, TEXT))
+		if (Paths.exists(scriptToLoad))
 		{
 			if (Iris.instances.exists(scriptToLoad))
 				return false;
@@ -3810,15 +3812,15 @@ class PlayState extends MusicBeatState
 			var frag:String = folder + name + '.frag';
 			var vert:String = folder + name + '.vert';
 			var found:Bool = false;
-			if (Paths.fileExists(frag))
+			if (Paths.exists(frag))
 			{
-				frag = File.getContent(frag);
+				frag = Paths.getContent(frag);
 				found = true;
 			}
 			else
 				frag = null;
 
-			if (Paths.fileExists(vert))
+			if (Paths.exists(vert))
 			{
 				vert = File.getContent(vert);
 				found = true;
@@ -3858,5 +3860,7 @@ class PlayState extends MusicBeatState
 	{
 		if (botplayText != null)
 			botplayText.visible = cpuControlled;
+		if (!wasBotplayed)
+			wasBotplayed = cpuControlled ? true : false;
 	}
 }

@@ -8,6 +8,7 @@ class FlxMacro
   /**
    * A macro to be called targeting the `FlxBasic` class.
    * @return An array of fields that the class contains.
+   * This wont be supported most likely
    */
   public static macro function buildFlxBasic():Array<haxe.macro.Expr.Field>
   {

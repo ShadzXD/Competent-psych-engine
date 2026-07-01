@@ -134,7 +134,6 @@ class TitleState extends MusicBeatState
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
 		ngSpr.updateHitbox();
 		ngSpr.screenCenter(X);
-		trace('MACRO TEST: ${ngSpr.zIndex}');
 
 		add(gfDance);
 		add(logoBl); // FNF Logo

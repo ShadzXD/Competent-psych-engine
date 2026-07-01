@@ -33,6 +33,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	var missingTextBG:FlxSprite;
 	var missingText:FlxText;
+	var openedGameplayChangers:Bool = false;
 
 	public static var songName:String = null;
 
@@ -168,7 +169,13 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function close()
 	{
-		PlayState.instance.updateGameplayModifiers();
+		if (openedGameplayChangers)
+		{
+			PlayState.instance.updateGameplayModifiers();
+			// not gonna try with this rn, too much stuff to do!
+			// PlayState.startOnTime = curTime;
+			// restartSong(true);
+		}
 		super.close();
 	}
 
@@ -330,7 +337,7 @@ class PauseSubState extends MusicBeatSubstate
 					// had to look at how troll does this because im a fucking moron
 					var substate = new GameplayChangersSubstate();
 					substate.cameras = this.cameras;
-
+					openedGameplayChangers = true;
 					this.openSubState(substate);
 					this.persistentDraw = false;
 

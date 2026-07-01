@@ -21,7 +21,7 @@ import backend.Mods;
 @:access(openfl.display.BitmapData)
 class Paths
 {
-	inline public static final SOUND_EXT = #if html5 "mp3" #else"ogg"#end;
+	inline public static final SOUND_EXT = #if html5 "mp3" #else "ogg" #end;
 	inline public static final VIDEO_EXT = "mp4";
 
 	public static function excludeAsset(key:String)
@@ -516,6 +516,7 @@ class Paths
 		return Json.parse(Assets.getText(path));
 		#end
 	}
+
 	/**
 	 * Get Content that works on non sys targets
 	 * @param key
@@ -532,4 +533,12 @@ class Paths
 		#end
 	}
 
+	inline public static function exists(path:String)
+	{
+		#if sys
+		return FileSystem.exists(path);
+		#else
+		return OpenFlAssets.exists(path, TEXT);
+		#end
+	}
 }

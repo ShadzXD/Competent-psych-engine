@@ -44,7 +44,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		// if (fromPlayState)
 		//	speedRate = PlayState.instance.playbackRate;
 		var path:String = Paths.getPath('data/popups/' + hud + '.json', TEXT, null, true);
-
+		trace(path);
 		try
 		{
 			loadJsonFile(Json.parse(Paths.getContent(path)));
