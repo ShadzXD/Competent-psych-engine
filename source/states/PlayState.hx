@@ -554,8 +554,6 @@ class PlayState extends MusicBeatState
 		moveCameraSection();
 
 		noteGroup.cameras = [camHUD];
-		grpHoldSplashes.cameras = [camHUD];
-
 		startingSong = true;
 
 		#if LUA_ALLOWED
@@ -1873,28 +1871,31 @@ class PlayState extends MusicBeatState
 							var daNote:Note = notes.members[i];
 							if (daNote == null)
 								continue;
-							var strumGroup:StrumLine = playerStrumline;
+
+							var curStrum:StrumLine = playerStrumline;
+
 							if (daNote.strumline != -1)
 							{
-								var strumGroup = strumlines.members[daNote.strumline];
+								curStrum = strumlines.members[daNote.strumline];
 							}
-							if (!daNote.mustPress)
-								strumGroup = opponentStrumline;
-							daNote.cameras = strumGroup.cameras;
+							else if (!daNote.mustPress)
+								curStrum = opponentStrumline;
+							daNote.cameras = curStrum.cameras;
 
-							var strum:StrumNote = strumGroup.members[daNote.noteData];
+							var strum:StrumNote = curStrum.members[daNote.noteData];
 							daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
 
 							if (daNote.mustPress)
 							{
 								if (cpuControlled
+									|| curStrum.cpuControlled
 									&& !daNote.blockHit
 									&& daNote.canBeHit
 									&& (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
-									goodNoteHit(daNote, strumGroup);
+									goodNoteHit(daNote, curStrum);
 							}
 							else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
-								opponentNoteHit(daNote, strumGroup);
+								opponentNoteHit(daNote, curStrum);
 
 							if (daNote.isSustainNote && strum.sustainReduce)
 								daNote.clipToStrumNote(strum);
@@ -3085,7 +3086,7 @@ class PlayState extends MusicBeatState
 
 		note.wasGoodHit = true;
 
-		if (note.hitsoundVolume > 0 && !note.hitsoundDisabled)
+		if (note.hitsoundVolume > 0 && !note.hitsoundDisabled && !strumline.cpuControlled)
 			FlxG.sound.play(Paths.sound(note.hitsound), note.hitsoundVolume);
 
 		if (!note.hitCausesMiss) // Common notes
@@ -3228,6 +3229,11 @@ class PlayState extends MusicBeatState
 				{
 					spawnHoldSplash(end, strumline);
 				}
+				// revisible it if accidently pressed off it
+				else if (leSplash != null)
+				{
+					leSplash.visible = true;
+				}
 			}
 		}
 	}
@@ -3237,7 +3243,8 @@ class PlayState extends MusicBeatState
 		var end:Note = note.isSustainNote ? note.parent.tail[note.parent.tail.length - 1] : note.tail[note.tail.length - 1];
 		var splash:SustainSplash = grpHoldSplashes.recycle(SustainSplash);
 		splash.setupSusSplash(strumline.members[note.noteData], note, playbackRate);
-		grpHoldSplashes.add(splash);
+		splash.cameras = strumline.cameras;
+		grpHoldSplashes.add(end.extraData['holdSplash'] = splash);
 	}
 
 	override function destroy()
@@ -3810,6 +3817,8 @@ class PlayState extends MusicBeatState
 	 */
 	public function getStrumlineNote(note:Note):StrumLine
 	{
+		if (note.strumline != -1 && note.strumline >= 0 && note.strumline < strumlines.length)
+			return strumlines.members[note.strumline];
 		return playerStrumline;
 	}
 }
