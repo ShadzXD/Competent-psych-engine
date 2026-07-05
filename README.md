@@ -7,7 +7,7 @@ Competent! Psych Engine
 
 
 
-My third (and hopefully) final Psych Engine fork.
+My third, and hopefully final Psych Engine fork. Please note that this engine is a major W.I.P and wont be worked on as frequently.
 
 
 
