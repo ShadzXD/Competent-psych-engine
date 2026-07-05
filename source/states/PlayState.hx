@@ -149,19 +149,13 @@ class PlayState extends MusicBeatState
 
 	private static var prevCamFollow:FlxObject;
 
-	public var strumLineNotes:FlxTypedGroup<StrumNote> = new FlxTypedGroup<StrumNote>();
-	public var opponentStrums:FlxTypedGroup<StrumNote> = new FlxTypedGroup<StrumNote>();
-	public var playerStrums:FlxTypedGroup<StrumNote> = new FlxTypedGroup<StrumNote>();
+	public var strumlines:FlxTypedGroup<StrumLine> = new FlxTypedGroup<StrumLine>();
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash> = new FlxTypedGroup<NoteSplash>();
 	public var grpHoldSplashes:FlxTypedGroup<SustainSplash> = new FlxTypedGroup<SustainSplash>();
 
 	public var playerStrumline:StrumLine;
 
 	public var opponentStrumline:StrumLine;
-
-	public var testStrumline:StrumLine;
-
-	public var strumlines:Array<StrumLine> = [];
 
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
@@ -508,21 +502,20 @@ class PlayState extends MusicBeatState
 		hudClass.visible = !ClientPrefs.data.hideHud;
 		useHealth = hudClass.useHealth;
 		add(hudClass);
+		var useMiddleScroll:Bool = ClientPrefs.data.middleScroll;
+
 		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
+		var strumLineX:Float = useMiddleScroll ? 300 : 655;
 
-		opponentStrumline = new StrumLine(0, strumLineY, 1, 4);
+		opponentStrumline = new StrumLine(0, strumLineY, 1);
 		opponentStrumline.cameras = [camHUD];
-		add(opponentStrumline);
+		opponentStrumline.canBeHidden = true;
+		strumlines.add(opponentStrumline);
 
-		playerStrumline = new StrumLine(650, strumLineY, 1, 4);
+		playerStrumline = new StrumLine(strumLineX, strumLineY, 1);
 		playerStrumline.cameras = [camHUD];
-		add(playerStrumline);
+		strumlines.add(playerStrumline);
 
-		testStrumline = new StrumLine(400, 100, 0, 4);
-		testStrumline.cameras = [camGame];
-		testStrumline.cpuControlled = true;
-		add(testStrumline);
-		strumlines = [opponentStrumline, playerStrumline, testStrumline];
 		botplayText = new FlxText(400, FlxG.height - 250, FlxG.width - 800, "[BOTPLAY]", 32);
 		botplayText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayText.scrollFactor.set();
@@ -535,7 +528,6 @@ class PlayState extends MusicBeatState
 		noteGroup.add(grpHoldSplashes);
 
 		Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
-		add(strumLineNotes);
 
 		generateSong();
 
@@ -1026,9 +1018,6 @@ class PlayState extends MusicBeatState
 				skipArrowStartTween = true;
 
 			canPause = true;
-			generateStaticArrows(0);
-			generateStaticArrows(1);
-
 			for (i in 0...playerStrumline.length)
 			{
 				setOnScripts('defaultPlayerStrumX' + i, playerStrumline.members[i].x);
@@ -1038,18 +1027,12 @@ class PlayState extends MusicBeatState
 			{
 				setOnScripts('defaultOpponentStrumX' + i, opponentStrumline.members[i].x);
 				setOnScripts('defaultOpponentStrumY' + i, opponentStrumline.members[i].y);
-				// if(ClientPrefs.data.middleScroll) opponentStrums.members[i].visible = false;
+				if (ClientPrefs.data.middleScroll)
+					opponentStrumline.members[i].visible = false;
 			}
 			// this is getting reworked, ignore it for now
 			/*
-				var strumUnderlay:FlxSprite = new FlxSprite(playerStrums.members[0].x - 20).makeGraphic(1, 1, FlxColor.BLACK);
-				strumUnderlay.scale.set(490, FlxG.height);
-				strumUnderlay.updateHitbox();
-				strumUnderlay.alpha = ClientPrefs.data.underlayOpacity;
-				strumUnderlay.scrollFactor.set();
-				strumUnderlay.screenCenter(Y);
-				strumUnderlay.cameras = [camPreHUD];
-				add(strumUnderlay);
+
 			 */
 			startedCountdown = true;
 			Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
@@ -1619,12 +1602,6 @@ class PlayState extends MusicBeatState
 	}
 
 	public var skipArrowStartTween:Bool = false; // for lua
-	public var useMiddleScroll:Bool = ClientPrefs.data.middleScroll;
-
-	private function generateStaticArrows(player:Int):Void
-	{
-		var strumLineX:Float = useMiddleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X;
-	}
 
 	override function openSubState(SubState:FlxSubState)
 	{
@@ -1898,9 +1875,9 @@ class PlayState extends MusicBeatState
 							var strumGroup:StrumLine = playerStrumline;
 							if (daNote.strumline != -1)
 							{
-								strumGroup = strumlines[daNote.strumline];
+								// strumGroup = strumlines[daNote.strumline];
 							}
-							else if (!daNote.mustPress)
+							if (!daNote.mustPress)
 								strumGroup = opponentStrumline;
 							daNote.cameras = strumGroup.cameras;
 
@@ -1909,7 +1886,7 @@ class PlayState extends MusicBeatState
 
 							if (daNote.mustPress)
 							{
-								if (strumGroup.cpuControlled
+								if (cpuControlled
 									&& !daNote.blockHit
 									&& daNote.canBeHit
 									&& (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
@@ -2709,7 +2686,7 @@ class PlayState extends MusicBeatState
 		score = Scoring.scoreNoteAccuracy(noteDiff);
 
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
-			spawnNoteSplashOnNote(note);
+			spawnNoteSplashOnNote(note, getStrumlineNote(note));
 
 		if (!wasBotplayed)
 		{
@@ -3174,9 +3151,9 @@ class PlayState extends MusicBeatState
 				songScore += Scoring.holdNoteScore();
 				RecalculateRating(false, false);
 			}
-			var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
-			if (gainHealth)
-				health += note.hitHealth * healthGain;
+			// var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
+			// if (gainHealth)
+			health += note.hitHealth * healthGain;
 		}
 		else // Notes that count as a miss if you hit them (Hurt notes for example)
 		{
@@ -3195,7 +3172,7 @@ class PlayState extends MusicBeatState
 
 			noteMiss(note);
 			if (!note.noteSplashData.disabled && !note.isSustainNote)
-				spawnNoteSplashOnNote(note);
+				spawnNoteSplashOnNote(note, strumline);
 		}
 		// spawnHoldSplashOnNote(note);
 
@@ -3214,11 +3191,11 @@ class PlayState extends MusicBeatState
 		note.destroy();
 	}
 
-	public function spawnNoteSplashOnNote(note:Note)
+	public function spawnNoteSplashOnNote(note:Note, strumline:StrumLine)
 	{
 		if (note != null)
 		{
-			var strum:StrumNote = playerStrumline.members[note.noteData];
+			var strum:StrumNote = strumline.members[note.noteData];
 			if (strum != null)
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note, strum);
 		}
@@ -3228,6 +3205,7 @@ class PlayState extends MusicBeatState
 	{
 		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.babyArrow = strum;
+		splash.cameras = strum.cameras;
 		splash.spawnSplashNote(x, y, data, note);
 		grpNoteSplashes.add(splash);
 	}
@@ -3260,7 +3238,7 @@ class PlayState extends MusicBeatState
 	{
 		var end:Note = note.isSustainNote ? note.parent.tail[note.parent.tail.length - 1] : note.tail[note.tail.length - 1];
 		var splash:SustainSplash = grpHoldSplashes.recycle(SustainSplash);
-		splash.setupSusSplash(strumLineNotes.members[note.noteData + (note.mustPress ? 4 : 0)], note, playbackRate);
+		splash.setupSusSplash(playerStrumline.members[note.noteData + (note.mustPress ? 4 : 0)], note, playbackRate);
 		grpHoldSplashes.add(end.extraData['holdSplash'] = splash);
 	}
 
@@ -3834,8 +3812,6 @@ class PlayState extends MusicBeatState
 	 */
 	public function getStrumlineNote(note:Note):StrumLine
 	{
-		if (note.strumline != -1 && note.strumline >= 0 && note.strumline < strumlines.length)
-			return strumlines[note.strumline];
 		return playerStrumline;
 	}
 }
