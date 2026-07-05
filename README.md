@@ -11,24 +11,26 @@ My third, and hopefully final Psych Engine fork. Please note that this engine is
 
 
 
-Competent! Psych engine is a fork of Psych engine v1.0.4 that aims to fix multiple bugs and make modding easier for the general source code modder.
+Competent! Psych engine is a fork of Psych engine v1.0.4 that aims to fix multiple bugs and make modding easier for the average source code modder.
 
 New Features
 ===========
-- Updates to multiple newer libraries.
+- Libraries have now been updated to newer versions.
 - Multiple Optimizations & Bug Fixes.
 - More visually pleasing sustain notes.
 - Easier way to create multiple strum-lines (W.I.P)
 - HTML5 Support (W.I.P)
 - Moved HUD to its own class.
 - Reorganized some file paths.
-- More Parity with newer Base game (Sustain Splashes, Sound tray, etc..).
+- More Parity with newer Base game.
+- Json driven ratings system (W.I.P)
+- (Sustain Splashes, Sound tray, etc..).
 
 Special Thanks:
 ===========
 [ashley](https://x.com/superinky_) - Fixed RGB Shader
 
-[Riconuts](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds & Half the ideas in this engine.
+[Riconuts](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds & i yoinked most ideas from troll.
 
 [autisticlulu](https://github.com/MeguminBOT/FNF-PsychEngine) - Multiple Fixes to the loading screen.
 
