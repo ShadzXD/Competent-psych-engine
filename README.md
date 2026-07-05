@@ -1,18 +1,26 @@
-COMPETENT PSYCH ENGINE 
+Competent! Psych Engine
 
-Contributors:
+My third (and hopefully) final Psych Engine fork.
+
+Competent! Psych engine is a fork of Psych engine v1.0.4 that aims to fix multiple bugs and make modding easier for the general source code modder.
+
+New Features
 ===========
-[ashley](https://x.com/superinky_) - Fixed RGB Shader
+- Updates to multiple newer libraries.
+- Multiple Optimizations & Bug Fixes.
+- More visually pleasing sustain notes.
+- Easier way to create multiple strum-lines (W.I.P)
+- HTML5 Support (W.I.P)
+- Moved HUD to its own class.
+- Reorganized some file paths.
+- More Parity with newer Base game (Sustain Splashes, Sound tray, etc..).
 
 Special Thanks:
 ===========
-[Troll Engine](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds sound effect
-
-My Personal Psych Engine v1.0.4 Fork made for fun.
-
-Aims to fix bugs with base Psych Engine and keep parity for the most part.
-
-Fork used for [VS Oshawott: Funkin' Beyond](https://gamebanana.com/mods/660851).
+[ashley](https://x.com/superinky_) - Fixed RGB Shader
+[Riconuts](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds & Half the ideas in this engine.
+[autisticlulu](https://github.com/MeguminBOT/FNF-PsychEngine) - Multiple Fixes to the loading screen.
+FNF Yatta Engine - Never came out :sob:
 
 Compile Guide
 ===========
@@ -23,19 +31,4 @@ Compile Guide
 5. run `haxelib --global run hmm setup` if its your first time compiling an fnf engine using `hmm`.
 6. run `hmm install` to install all of the game's libraries.
 7. run `lime test windows` to compile the game.
-
-New Features
-===========
-- Updates texture-atlas library to flixel animate.
-- Lower RAM usage + multiple General Optimizations.
-- More visually pleasing sustain notes.
-- Removal of Language Support.
-- Removal of Title JSON.
-- Multiple Bug fixes from base Psych Engine.
-- Most libraries have been updated to newer verseions.
-- Moved HUD to its own class.
-- Reorganized some file paths.
-- Added Sustain Splashes from Base Game
-- And alot more!
-
 
