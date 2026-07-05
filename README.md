@@ -1,9 +1,15 @@
 Competent! Psych Engine
 ===========
 
+
+
 <img width="1286" height="730" alt="incompetent" src="https://github.com/user-attachments/assets/62e0d9e4-bc74-420e-beb7-a634ab0a7843" />
 
+
+
 My third (and hopefully) final Psych Engine fork.
+
+
 
 Competent! Psych engine is a fork of Psych engine v1.0.4 that aims to fix multiple bugs and make modding easier for the general source code modder.
 
