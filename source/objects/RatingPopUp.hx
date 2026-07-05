@@ -20,7 +20,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 {
 	var antialiasing:Bool = true;
 	var placement:Float;
-	var uiPrefix:String = '';
+	var uiPrefix:String = 'popups/funkin/';
 	var uiSuffix:String = '';
 
 	public var hudType:String;

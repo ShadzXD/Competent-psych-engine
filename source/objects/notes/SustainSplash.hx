@@ -45,7 +45,7 @@ class SustainSplash extends FlxSprite
 	public function setupSusSplash(strum:StrumNote, daNote:Note, ?playbackRate:Float = 1):Void
 	{
 		final lengthToGet:Int = !daNote.isSustainNote ? daNote.tail.length : daNote.parent.tail.length;
-		if (strum.visible == false) // kill splash if size of hold is too small
+		if (strum.visible == false || strum == null) // kill splash if size of hold is too small
 		{
 			kill();
 			return;
