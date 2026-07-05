@@ -1,4 +1,5 @@
 package options;
+
 import options.Option;
 
 class GameplaySettingsSubState extends BaseOptionsMenu
@@ -79,9 +80,11 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.maxValue = 10;
 		option.changeValue = 0.1;
 		addOption(option);
-
+		#if desktop
+		// no dev modes on html5 because fuck u
 		var option:Option = new Option('Developer Mode', "If checked, will grant access to developer editors.", 'developerMode', BOOL);
 		addOption(option);
+		#end
 		super();
 	}
 

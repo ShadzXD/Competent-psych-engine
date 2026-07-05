@@ -25,6 +25,7 @@ import substates.PauseSubState;
 import substates.GameOverSubstate;
 import psychlua.LuaUtils;
 import psychlua.LuaUtils.LuaTweenOptions;
+import objects.notes.StrumLine;
 #if HSCRIPT_ALLOWED
 import psychlua.HScript;
 #end
@@ -1954,10 +1955,12 @@ class FunkinLua
 		if (PlayState.instance == null)
 			return null;
 
-		var strumNote:StrumNote = PlayState.instance.strumLineNotes.members[note % PlayState.instance.strumLineNotes.length];
+		var strumline:StrumLine = PlayState.instance.strumlines.members[note % PlayState.instance.strumlines.length];
+		if (strumline == null)
+			return null;
+		var strumNote:StrumNote = strumline.members[note];
 		if (strumNote == null)
 			return null;
-
 		if (tag != null)
 		{
 			var originalTag:String = tag;

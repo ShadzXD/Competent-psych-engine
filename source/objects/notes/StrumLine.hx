@@ -34,8 +34,6 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 
 		for (i in 0...noteAmount)
 		{
-			if (!ClientPrefs.data.opponentStrums || (ClientPrefs.data.middleScroll && canBeHidden))
-				visible = false;
 			var babyArrow:StrumNote = new StrumNote(x, y, i, player);
 			babyArrow.downScroll = ClientPrefs.data.downScroll;
 			var targetAlpha:Float = 1;
@@ -43,14 +41,14 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 			babyArrow.alpha = 0;
 			FlxTween.tween(babyArrow, {/*y: babyArrow.y + 10,*/ alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 			// babyArrow.y -= 10;
-			doIntroTransition(babyArrow);
 			// babyArrow.alpha = targetAlpha;
 			add(babyArrow);
 			babyArrow.playerPosition();
 		}
 	}
-
-	public function doIntroTransition(arrow:StrumNote)
-	{
-	}
+	/*
+		public function doIntroTransition(arrow:StrumNote)
+		{
+		}
+	 */
 }

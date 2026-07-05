@@ -47,6 +47,7 @@ class LoadingState extends MusicBeatState
 	static var progressMutex:Mutex = new Mutex(); // guards loaded/threadsCompleted counters
 	static var threadPool:FixedThreadPool = null;
 	#end
+
 	function new(target:FlxState, stopMusic:Bool)
 	{
 		this.target = target;
@@ -79,6 +80,7 @@ class LoadingState extends MusicBeatState
 	{
 		persistentUpdate = true;
 		#if html5
+		// skip the loading screen on html5 since its useless lmaooo
 		onLoad();
 		#end
 
@@ -267,7 +269,6 @@ class LoadingState extends MusicBeatState
 
 		FlxTransitionableState.skipNextTransIn = true;
 		#if MULTITHREADED_LOADING
-
 		if (threadPool != null)
 			threadPool.shutdown(); // kill all workers safely
 		threadPool = null;
@@ -284,7 +285,6 @@ class LoadingState extends MusicBeatState
 		var pending:Map<String, BitmapData> = null;
 		var pendingKeys:Map<String, String> = null;
 		#if MULTITHREADED_LOADING
-
 		if (mutex != null)
 			mutex.acquire();
 		if (requestedBitmaps.keys().hasNext())
@@ -453,7 +453,6 @@ class LoadingState extends MusicBeatState
 		var song:SwagSong = PlayState.SONG;
 		var folder:String = Paths.formatToSongPath(Song.loadedSongName);
 		#if MULTITHREADED_LOADING
-
 		/* one sequential prep task off the main thread: build the asset lists, then kick off the
 			per-asset loaders. startThreads() always runs (even on failure) so prep can't softlock */
 		threadPool.run(() ->
@@ -614,7 +613,6 @@ class LoadingState extends MusicBeatState
 			}
 		}
 
-
 		var i:Int = 0;
 		while (i < arr.length)
 		{
@@ -774,7 +772,6 @@ class LoadingState extends MusicBeatState
 	{
 		var file:String = Paths.getPath(key + '.${Paths.SOUND_EXT}', SOUND, path, modsAllowed);
 		#if MULTITHREADED_LOADING
-
 		// trace('precaching sound: $file');
 		if (!Paths.currentTrackedSounds.exists(file))
 		{
