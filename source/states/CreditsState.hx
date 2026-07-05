@@ -39,7 +39,7 @@ class CreditsState extends MusicBeatState
 
 		var defaultList:Array<Array<String>> = [
 			// Name - Icon name - Description - Link - BG Color
-			["Shadz' Psych  Fork"],
+			["Competent! Psych Engine"],
 			["Shadz", "shadz", "Owner of the fork", "https://x.com/ShadzDX", "378FC7"],
 			["Psych Engine Team"],
 			[

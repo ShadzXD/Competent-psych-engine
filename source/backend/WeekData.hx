@@ -70,26 +70,15 @@ class WeekData
 
 	public function new(weekFile:WeekFile, fileName:String)
 	{
-		//this sucks but it works
-		#if !html5
+		// here ya go - MiguelItsOut
+		var fields:Array<String> = Reflect.fields(#if js js.lib.Object.getPrototypeOf(this) #else this #end); // fix crash on html5
 		for (field in Reflect.fields(weekFile))
-			if (Reflect.fields(this).contains(field)) // Reflect.hasField() won't fucking work :/
+		{
+			if (fields.contains(field))
 				Reflect.setProperty(this, field, Reflect.getProperty(weekFile, field));
+		}
 
 		this.fileName = fileName;
-		#else
-    	songs = weekFile.songs;
-    	weekCharacters = weekFile.weekCharacters;
-    	weekBackground = weekFile.weekBackground;
-    	weekBefore = weekFile.weekBefore;
-    	storyName = weekFile.storyName;
-    	weekName = weekFile.weekName;
-    	startUnlocked = weekFile.startUnlocked;
-    	hiddenUntilUnlocked = weekFile.hiddenUntilUnlocked;
-    	hideStoryMode = weekFile.hideStoryMode;
-    	hideFreeplay = weekFile.hideFreeplay;
-    	difficulties = weekFile.difficulties;
-		#end
 	}
 
 	public static function reloadWeekFiles(isStoryMode:Null<Bool> = false)

@@ -1871,7 +1871,7 @@ class PlayState extends MusicBeatState
 							var daNote:Note = notes.members[i];
 							if (daNote == null)
 								continue;
-
+							// custom strum line note support, not happening for now
 							var strumGroup:StrumLine = playerStrumline;
 							if (daNote.strumline != -1)
 							{

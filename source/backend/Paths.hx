@@ -518,18 +518,17 @@ class Paths
 	}
 
 	/**
-	 * Get Content that works on non sys targets
+	 * Get Content function that works on non sys targets
 	 * @param key
 	 * @param ignoreMods
 	 * @return String
 	 */
 	inline static public function getContent(key:String, ?ignoreMods:Bool = false):String
 	{
-		var path:String = getPath(key, TEXT, !ignoreMods);
 		#if sys
-		return (FileSystem.exists(path)) ? File.getContent(path) : null;
+		return (FileSystem.exists(key)) ? File.getContent(key) : null;
 		#else
-		return (OpenFlAssets.exists(path, TEXT)) ? Assets.getText(path) : null;
+		return (OpenFlAssets.exists(key, TEXT)) ? Assets.getText(key) : null;
 		#end
 	}
 
