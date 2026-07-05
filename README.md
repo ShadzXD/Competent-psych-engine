@@ -27,8 +27,11 @@ New Features
 Special Thanks:
 ===========
 [ashley](https://x.com/superinky_) - Fixed RGB Shader
+
 [Riconuts](https://github.com/troll-slaiyers/FNF-Troll-Engine) - Hitsounds & Half the ideas in this engine.
+
 [autisticlulu](https://github.com/MeguminBOT/FNF-PsychEngine) - Multiple Fixes to the loading screen.
+
 FNF Yatta Engine - Never came out :sob:
 
 Compile Guide
