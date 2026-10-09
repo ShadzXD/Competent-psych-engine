@@ -7,6 +7,7 @@ import openfl.utils.Assets;
 import haxe.Json;
 import backend.Song;
 import backend.FunkinSprite;
+import states.stages.objects.TankmenBG;
 
 typedef CharacterFile =
 {
@@ -208,13 +209,13 @@ class Character extends FunkinSprite
 		animationsArray = json.animations;
 		if (animationsArray != null && animationsArray.length > 0)
 		{
-			for (balls in animationsArray)
+			for (curAnim in animationsArray)
 			{
-				var animAnim:String = '' + balls.anim;
-				var animName:String = '' + balls.name;
-				var animFps:Int = balls.fps;
-				var animLoop:Bool = !!balls.loop; // Bruh
-				var animIndices:Array<Int> = balls.indices;
+				var animAnim:String = '' + curAnim.anim;
+				var animName:String = '' + curAnim.name;
+				var animFps:Int = curAnim.fps;
+				var animLoop:Bool = curAnim.loop; // Bruh
+				var animIndices:Array<Int> = curAnim.indices;
 
 				if (!isAnimateAtlas)
 				{
@@ -231,10 +232,10 @@ class Character extends FunkinSprite
 						anim.addBySymbol(animAnim, animName, animFps, animLoop);
 				}
 
-				if (balls.offsets != null && balls.offsets.length > 1)
-					addOffset(balls.anim, balls.offsets[0], balls.offsets[1]);
+				if (curAnim.offsets != null && curAnim.offsets.length > 1)
+					addOffset(curAnim.anim, curAnim.offsets[0], curAnim.offsets[1]);
 				else
-					addOffset(balls.anim, 0, 0);
+					addOffset(curAnim.anim, 0, 0);
 			}
 		}
 
@@ -422,6 +423,14 @@ class Character extends FunkinSprite
 	{
 		try
 		{
+			var songData:SwagSong = Song.getChart('picospeaker', Paths.formatToSongPath(Song.loadedSongName));
+			if (songData != null)
+				for (section in songData.notes)
+					for (songNotes in section.sectionNotes)
+						animationNotes.push(songNotes);
+
+			TankmenBG.animationNotes = animationNotes;
+			animationNotes.sort(sortAnims);
 		}
 		catch (e:Dynamic)
 		{

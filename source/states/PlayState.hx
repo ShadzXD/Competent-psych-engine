@@ -505,16 +505,19 @@ class PlayState extends MusicBeatState
 		var useMiddleScroll:Bool = ClientPrefs.data.middleScroll;
 
 		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
-		var strumLineX:Float = useMiddleScroll ? 300 : 655;
+		var strumLineX:Float = useMiddleScroll ? 310 : 655;
 
-		opponentStrumline = new StrumLine(0, strumLineY, 1);
+		opponentStrumline = new StrumLine(0, strumLineY, 1, ClientPrefs.data.downScroll);
 		opponentStrumline.cameras = [camHUD];
 		opponentStrumline.canBeHidden = true;
 		strumlines.add(opponentStrumline);
 
-		playerStrumline = new StrumLine(strumLineX, strumLineY, 1);
+		playerStrumline = new StrumLine(strumLineX, strumLineY, 1, ClientPrefs.data.downScroll);
 		playerStrumline.cameras = [camHUD];
 		strumlines.add(playerStrumline);
+
+		opponentStrumline.characters = [dad];
+		playerStrumline.characters = [boyfriend];
 
 		botplayText = new FlxText(400, FlxG.height - 250, FlxG.width - 800, "[BOTPLAY]", 32);
 		botplayText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -1872,14 +1875,8 @@ class PlayState extends MusicBeatState
 							if (daNote == null)
 								continue;
 
-							var curStrum:StrumLine = playerStrumline;
+							var curStrum:StrumLine = getStrumlineNote(daNote);
 
-							if (daNote.strumline != -1)
-							{
-								curStrum = strumlines.members[daNote.strumline];
-							}
-							else if (!daNote.mustPress)
-								curStrum = opponentStrumline;
 							daNote.cameras = curStrum.cameras;
 
 							var strum:StrumNote = curStrum.members[daNote.noteData];
@@ -1904,7 +1901,7 @@ class PlayState extends MusicBeatState
 							if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
 							{
 								if (daNote.mustPress && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit))
-									noteMiss(daNote);
+									noteMiss(daNote, curStrum);
 
 								daNote.active = daNote.visible = false;
 								invalidateNote(daNote);
@@ -2779,8 +2776,7 @@ class PlayState extends MusicBeatState
 				}
 			}
 			var strum:StrumLine = getStrumlineNote(funnyNote);
-			if (funnyNote.strumline == -1 || funnyNote.strumline != -1 && !strum.cpuControlled)
-				goodNoteHit(funnyNote, getStrumlineNote(funnyNote));
+			goodNoteHit(funnyNote, strum);
 		}
 		else
 		{
@@ -2912,7 +2908,7 @@ class PlayState extends MusicBeatState
 					keyReleased(i);
 	}
 
-	function noteMiss(daNote:Note):Void
+	function noteMiss(daNote:Note, strumline:StrumLine):Void
 	{ // You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		// Dupe note remove
 		notes.forEachAlive(function(note:Note)
@@ -2925,7 +2921,7 @@ class PlayState extends MusicBeatState
 				invalidateNote(note);
 		});
 
-		noteMissCommon(daNote.noteData, daNote);
+		noteMissCommon(daNote.noteData, daNote, strumline);
 		stagesFunc(function(stage:BaseStage) stage.noteMiss(daNote));
 		var result:Dynamic = callOnLuas('noteMiss', [
 			notes.members.indexOf(daNote),
@@ -2951,7 +2947,7 @@ class PlayState extends MusicBeatState
 		callOnScripts('noteMissPress', [direction]);
 	}
 
-	function noteMissCommon(direction:Int, note:Note = null)
+	function noteMissCommon(direction:Int, note:Note = null, strumline:StrumLine = null)
 	{
 		// score and data
 		var subtract:Float = pressMissDamage;
@@ -2978,29 +2974,32 @@ class PlayState extends MusicBeatState
 		RecalculateRating(true, false);
 
 		// play character anims
-		var char:Character = boyfriend;
+		var chars:Array<Character> = strumline.characters == null ? [boyfriend] : strumline.characters;
 		if ((note != null && note.gfNote) || (SONG.notes[curSection] != null && SONG.notes[curSection].gfSection))
-			char = gf;
-
-		if (char != null && (note == null || !note.noMissAnimation) && char.hasMissAnimations)
+			chars = [gf];
+		for (char in chars)
 		{
-			var postfix:String = '';
-			if (note != null)
-				postfix = note.animSuffix;
-
-			var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, direction)))] + 'miss' + postfix;
-			char.playAnim(animToPlay, true);
-
-			if (char != gf && lastCombo > 5 && gf != null && gf.hasAnimation('sad'))
+			if (char != null && (note == null || !note.noMissAnimation) && char.hasMissAnimations)
 			{
-				gf.playAnim('sad');
-				gf.specialAnim = true;
+				var postfix:String = '';
+				if (note != null)
+					postfix = note.animSuffix;
+
+				var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, direction)))] + 'miss' + postfix;
+				char.playAnim(animToPlay, true);
+
+				if (char != gf && lastCombo > 5 && gf != null && gf.hasAnimation('sad'))
+				{
+					gf.playAnim('sad');
+					gf.specialAnim = true;
+				}
 			}
 		}
+
 		vocals.volume = 0;
 	}
 
-	function opponentNoteHit(note:Note, ?strumline:StrumLine):Void
+	function opponentNoteHit(note:Note, strumline:StrumLine):Void
 	{
 		var result:Dynamic = callOnLuas('opponentNoteHitPre', [
 			notes.members.indexOf(note),
@@ -3015,41 +3014,9 @@ class PlayState extends MusicBeatState
 			return;
 
 		camZooming = true;
-
-		if (note.noteType == 'Hey!' && dad.hasAnimation('hey'))
-		{
-			dad.playAnim('hey', true);
-			dad.specialAnim = true;
-			dad.heyTimer = 0.6;
-		}
-		else if (!note.noAnimation)
-		{
-			var char:Character = dad;
-			var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, note.noteData)))] + note.animSuffix;
-			if (note.gfNote)
-				char = gf;
-
-			if (char != null)
-			{
-				var canPlay:Bool = true;
-				if (note.isSustainNote)
-				{
-					var holdAnim:String = animToPlay + '-hold';
-					if (char.animation.exists(holdAnim))
-						animToPlay = holdAnim;
-					if (char.getAnimationName() == holdAnim || char.getAnimationName() == holdAnim + '-loop')
-						canPlay = false;
-				}
-
-				if (canPlay)
-					char.playAnim(animToPlay, true);
-				char.holdTimer = 0;
-			}
-		}
-
 		if (!hasOpponentVoices)
 			vocals.volume = 1;
-		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate, strumline);
+		strumline.playConfirmAnim(Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 		note.hitByOpponent = true;
 		stagesFunc(function(stage:BaseStage) stage.opponentNoteHit(note));
 		var result:Dynamic = callOnLuas('opponentNoteHit', [
@@ -3060,7 +3027,7 @@ class PlayState extends MusicBeatState
 		]);
 		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 			callOnHScript('opponentNoteHit', [note]);
-		spawnHoldSplashOnNote(note, strumline);
+		commonNoteHit(note, strumline);
 
 		if (!note.isSustainNote)
 			invalidateNote(note);
@@ -3091,45 +3058,6 @@ class PlayState extends MusicBeatState
 
 		if (!note.hitCausesMiss) // Common notes
 		{
-			if (!note.noAnimation)
-			{
-				var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, note.noteData)))] + note.animSuffix;
-
-				var char:Character = boyfriend;
-				var animCheck:String = 'hey';
-				if (note.gfNote)
-				{
-					char = gf;
-					animCheck = 'cheer';
-				}
-
-				if (char != null)
-				{
-					var canPlay:Bool = true;
-					if (note.isSustainNote)
-					{
-						var holdAnim:String = animToPlay + '-hold';
-						if (char.animation.exists(holdAnim))
-							animToPlay = holdAnim;
-						if (char.getAnimationName() == holdAnim || char.getAnimationName() == holdAnim + '-loop')
-							canPlay = false;
-					}
-
-					if (canPlay)
-						char.playAnim(animToPlay, true);
-					char.holdTimer = 0;
-
-					if (note.noteType == 'Hey!')
-					{
-						if (char.hasAnimation(animCheck))
-						{
-							char.playAnim(animCheck, true);
-							char.specialAnim = true;
-							char.heyTimer = 0.6;
-						}
-					}
-				}
-			}
 			// kind of busted but it works
 			if (!cpuControlled && note.strumline == -1)
 			{
@@ -3138,14 +3066,16 @@ class PlayState extends MusicBeatState
 					spr.playAnim('confirm', true);
 			}
 			else
-				strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate, strumline);
+				strumline.playConfirmAnim(Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 			vocals.volume = 1;
+			commonNoteHit(note, strumline);
 
 			if (!note.isSustainNote)
 			{
-				combo++;
-				if (combo > 9999)
-					combo = 9999;
+				combo = 9999;
+				// combo++;
+				// if (combo > 9999)
+				combo = 9999;
 				popUpScore(note);
 			}
 			if (note.isSustainNote && !wasBotplayed)
@@ -3172,11 +3102,10 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			noteMiss(note);
+			noteMiss(note, strumline);
 			if (!note.noteSplashData.disabled && !note.isSustainNote)
 				spawnNoteSplashOnNote(note, strumline);
 		}
-		spawnHoldSplashOnNote(note, strumline);
 
 		stagesFunc(function(stage:BaseStage) stage.goodNoteHit(note));
 		var result:Dynamic = callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
@@ -3184,6 +3113,63 @@ class PlayState extends MusicBeatState
 			callOnHScript('goodNoteHit', [note]);
 		if (!note.isSustainNote)
 			invalidateNote(note);
+	}
+
+	public var camMove:Int = 20;
+
+	public function commonNoteHit(note:Note, strumline:StrumLine)
+	{
+		var chars:Array<Character> = strumline.characters;
+		// la fairs
+		if (note.gfNote || SONG.notes[curSection] != null && SONG.notes[curSection].gfSection)
+			chars = [gf];
+
+		switch (Std.int(Math.abs(note.noteData)))
+		{
+			case 0:
+				noteCameraMovement(-camMove, 0);
+			case 1:
+				noteCameraMovement(0, camMove);
+			case 2:
+				noteCameraMovement(0, -camMove);
+			case 3:
+				noteCameraMovement(camMove, 0);
+		}
+		for (char in chars)
+		{
+			if (char != null)
+			{
+				if (note.noteType == 'Hey!' && char.hasAnimation('hey'))
+				{
+					char.playAnim('hey', true);
+					char.specialAnim = true;
+					char.heyTimer = 0.6;
+				}
+				else if (!note.noAnimation)
+				{
+					var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, note.noteData)))] + note.animSuffix;
+					var canPlay:Bool = true;
+					if (note.isSustainNote)
+					{
+						var holdAnim:String = animToPlay + '-hold';
+						if (char.animation.exists(holdAnim))
+							animToPlay = holdAnim;
+						if (char.getAnimationName() == holdAnim || char.getAnimationName() == holdAnim + '-loop')
+							canPlay = false;
+					}
+
+					if (canPlay)
+						char.playAnim(animToPlay, true);
+					char.holdTimer = 0;
+				}
+			}
+		}
+
+		spawnHoldSplashOnNote(note, strumline);
+	}
+
+	public function noteCameraMovement(_x:Float, _y:Float)
+	{
 	}
 
 	public function invalidateNote(note:Note):Void
@@ -3611,18 +3597,6 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	function strumPlayAnim(isDad:Bool, id:Int, time:Float, strumline:StrumLine)
-	{
-		var spr:StrumNote = null;
-		spr = strumline.members[id];
-
-		if (spr != null)
-		{
-			spr.playAnim('confirm', true);
-			spr.resetAnim = time;
-		}
-	}
-
 	public var ratingPercent:Float;
 
 	public function RecalculateRating(badHit:Bool = false, scoreBop:Bool = true)
@@ -3659,11 +3633,9 @@ class PlayState extends MusicBeatState
 	#if ACHIEVEMENTS_ALLOWED
 	private function checkForAchievement(achievesToCheck:Array<String> = null)
 	{
-		if (chartingMode)
-			return;
-
 		var usedPractice:Bool = (ClientPrefs.getGameplaySetting('practice') || ClientPrefs.getGameplaySetting('botplay'));
-		if (cpuControlled)
+
+		if (cpuControlled || chartingMode)
 			return;
 
 		for (name in achievesToCheck)
@@ -3817,8 +3789,18 @@ class PlayState extends MusicBeatState
 	 */
 	public function getStrumlineNote(note:Note):StrumLine
 	{
-		if (note.strumline != -1 && note.strumline >= 0 && note.strumline < strumlines.length)
-			return strumlines.members[note.strumline];
-		return playerStrumline;
+		///IDFK
+		if (note == null)
+		{
+			return null;
+		}
+		if (note.strumline != -1 && note.strumline < strumlines.length)
+		{
+			var strumline:StrumLine = strumlines.members[note.strumline];
+			if (strumline != null)
+				return strumline;
+		}
+
+		return note.mustPress ? playerStrumline : opponentStrumline;
 	}
 }
