@@ -3033,7 +3033,7 @@ class PlayState extends MusicBeatState
 			invalidateNote(note);
 	}
 
-	public function goodNoteHit(note:Note, ?strumline:StrumLine):Void
+	public function goodNoteHit(note:Note, strumline:StrumLine):Void
 	{
 		if (note.wasGoodHit)
 			return;
@@ -3157,7 +3157,8 @@ class PlayState extends MusicBeatState
 						if (char.getAnimationName() == holdAnim || char.getAnimationName() == holdAnim + '-loop')
 							canPlay = false;
 					}
-
+					if (!char.animation.exists(animToPlay))
+						canPlay = false;
 					if (canPlay)
 						char.playAnim(animToPlay, true);
 					char.holdTimer = 0;

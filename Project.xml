@@ -31,6 +31,7 @@
 	<define name="SHOW_LOADING_SCREEN" />
 	<define name="BASE_GAME_FILES" />
 	<define name="VIDEOS_ALLOWED" unless ="32bits"/>
+	<!--define name="OLD_SONG_FILE_STRUCTURE" if ="desktop" /-->
 
 	<!-- ____________________________ Window Settings ___________________________ -->
 

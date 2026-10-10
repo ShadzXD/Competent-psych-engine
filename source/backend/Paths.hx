@@ -187,6 +187,15 @@ class Paths
 	inline static public function json(key:String, ?folder:String)
 		return getPath('data/$key.json', TEXT, folder, true);
 
+	inline static public function songJson(key:String, ?folder:String)
+	{
+		#if OLD_SONG_FILE_STRUCTURE
+		return getPath('data/$key.json', TEXT, folder, true);
+		#end
+
+		return 'assets/songs/$key.json';
+	}
+
 	inline static public function shaderFragment(key:String, ?folder:String)
 		return getPath('shaders/$key.frag', TEXT, folder, true);
 
@@ -460,7 +469,7 @@ class Paths
 		return 'mods/' + key;
 
 	inline static public function modsJson(key:String)
-		return modFolders('data/' + key + '.json');
+		return modFolders('songs/' + key + '.json');
 
 	inline static public function modsVideo(key:String)
 		return modFolders('videos/' + key + '.' + VIDEO_EXT);
