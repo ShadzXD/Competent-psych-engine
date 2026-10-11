@@ -26,14 +26,15 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 	public var hudType:String;
 
 	var ratingScale:Float = 0.6;
-	var numScale:Float = 0.7;
+	var numScale:Float = 0.6;
 
 	var speedRate:Float = 1;
 	var ratingsData:Array<Rating> = Rating.loadDefault();
 	var isBotplay:Bool = false;
 
-	// Stores Ratings and Combo Sprites in a group
-	override public function new(hud:String, ?shouldDisappear:Bool = true)
+	public var tweenOut:Bool = true;
+
+	override public function new(hud:String)
 	{
 		super();
 
@@ -52,6 +53,8 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		catch (e:Dynamic)
 		{
 			trace('Error loading popop file of "$hud": $e');
+			path = Paths.getPath('data/popups/funkin.json', TEXT, null, true);
+			loadJsonFile(Json.parse(Paths.getContent(path)));
 		}
 	}
 
@@ -72,14 +75,16 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		rating.setGraphicSize(Std.int(rating.width * ratingScale));
 		rating.updateHitbox();
 		add(rating);
-
-		FlxTween.tween(rating, {alpha: 0}, 0.2 / speedRate, {
-			onComplete: function(tween:FlxTween)
-			{
-				rating.destroy();
-			},
-			startDelay: Conductor.crochet * 0.001 / speedRate
-		});
+		if (tweenOut)
+		{
+			FlxTween.tween(rating, {alpha: 0}, 0.2 / speedRate, {
+				onComplete: function(tween:FlxTween)
+				{
+					rating.destroy();
+				},
+				startDelay: Conductor.crochet * 0.001 / speedRate
+			});
+		}
 	}
 
 	public function loadJsonFile(json:Dynamic)
@@ -122,14 +127,16 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 			numScore.velocity.x = FlxG.random.float(-5, 5) * speedRate;
 			numScore.antialiasing = antialiasing;
 			add(numScore);
-
-			FlxTween.tween(numScore, {alpha: 0}, 0.2 / speedRate, {
-				onComplete: function(tween:FlxTween)
-				{
-					numScore.destroy();
-				},
-				startDelay: Conductor.crochet * 0.002 / speedRate
-			});
+			if (tweenOut)
+			{
+				FlxTween.tween(numScore, {alpha: 0}, 0.2 / speedRate, {
+					onComplete: function(tween:FlxTween)
+					{
+						numScore.destroy();
+					},
+					startDelay: Conductor.crochet * 0.002 / speedRate
+				});
+			}
 
 			daLoop++;
 			if (numScore.x > xThing)
@@ -137,31 +144,6 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		}
 	}
 
-	/*
-		public function loadStuff()
-		{
-			switch (hudType)
-			{
-				case 'FUNKIN':
-					uiPrefix = 'ratingPopups/funkin/';
-
-				case 'PIXEL':
-					uiPrefix = 'pixelUI/';
-					uiSuffix = '-pixel';
-					size = 5;
-					antialias = false;
-
-				case 'OSHA':
-					uiPrefix = 'popups/oshawott/';
-					antialias = false;
-
-				case 'COCOON':
-					uiPrefix = 'popups/cocoon/';
-					antialias = false;
-			}
-			antialias = antialias && ClientPrefs.data.antialiasing;
-		}
-	 */
 	private function cachePopUpScore()
 	{
 		trace('precaching');
