@@ -77,6 +77,9 @@ class StageData
 				return cast haxe.Json.parse(Assets.getText(path));
 			#end
 		}
+		catch (e:Dynamic)
+		{
+		}
 		return dummy();
 	}
 }
