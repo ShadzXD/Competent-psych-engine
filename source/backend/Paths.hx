@@ -181,6 +181,16 @@ class Paths
 	inline static public function txt(key:String, ?folder:String)
 		return getPath('data/$key.txt', TEXT, folder, true);
 
+	inline static public function songTxt(key:String, ?folder:String)
+	{
+		#if MODS_ALLOWED
+		var file:String = getPath('songs/$key.txt', TEXT, folder, true);
+		if (FileSystem.exists(file))
+			return file;
+		#end
+		return 'assets/songs/$key.txt';
+	}
+
 	inline static public function xml(key:String, ?folder:String)
 		return getPath('data/$key.xml', TEXT, folder, true);
 
@@ -189,10 +199,15 @@ class Paths
 
 	inline static public function songJson(key:String, ?folder:String)
 	{
+		// old file structure like how base psych does it.
 		#if OLD_SONG_FILE_STRUCTURE
 		return getPath('data/$key.json', TEXT, folder, true);
 		#end
-
+		#if MODS_ALLOWED
+		var file:String = getPath('songs/$key.json', TEXT, folder, true);
+		if (FileSystem.exists(file))
+			return file;
+		#end
 		return 'assets/songs/$key.json';
 	}
 

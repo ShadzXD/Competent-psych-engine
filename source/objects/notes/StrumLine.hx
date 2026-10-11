@@ -56,4 +56,16 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 		this.members[id].playAnim('confirm', true);
 		this.members[id].resetAnim = time;
 	}
+
+	public function updateChars(oldChar:Character, newChar:Character)
+	{
+		if (oldChar == null || newChar == null)
+			return;
+
+		for (i in 0...characters.length)
+		{
+			if (characters[i] == oldChar)
+				characters[i] = newChar;
+		}
+	}
 }
