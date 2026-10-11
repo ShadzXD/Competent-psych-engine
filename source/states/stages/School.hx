@@ -78,8 +78,6 @@ class School extends BaseStage
 			bgGirls.scrollFactor.set(0.9, 0.9);
 			add(bgGirls);
 		}
-		setDefaultGF('gf-pixel');
-
 		switch (songName)
 		{
 			case 'senpai':
