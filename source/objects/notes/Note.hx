@@ -6,6 +6,7 @@ import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 import objects.notes.StrumNote;
 import flixel.math.FlxRect;
+import math.Vector3;
 
 using StringTools;
 
@@ -52,6 +53,8 @@ class Note extends FlxSprite
 
 	public var strumTime:Float = 0;
 	public var noteData:Int = 0;
+	public var defScale:FlxPoint = FlxPoint.get(); // for modcharts to keep the scaling
+	public var vec3Cache:Vector3 = new Vector3(); // for vector3 operations in modchart code
 
 	public var mustPress:Bool = false;
 	public var canBeHit:Bool = false;
@@ -99,6 +102,12 @@ class Note extends FlxSprite
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	public static var defaultNoteSkin(default, never):String = 'noteSkins/NOTE_assets';
 
+	public var typeOffsetX:Float = 0; // used to offset notes, mainly for note types. use in place of offset.x and offset.y when offsetting notetypes
+	public var typeOffsetY:Float = 0;
+	public var alphaMod:Float = 1;
+	public var mAngle:Float = 0;
+	public var bAngle:Float = 0;
+	public var alphaMod2:Float = 1; // TODO: unhardcode this shit lmao
 	public var noteSplashData:NoteSplashData = {
 		disabled: false,
 		texture: null,
@@ -172,6 +181,8 @@ class Note extends FlxSprite
 		if (isSustainNote && animation.curAnim != null && !animation.curAnim.name.endsWith('end'))
 		{
 			scale.y *= ratio;
+			defScale.y = scale.y;
+
 			updateHitbox();
 		}
 	}

@@ -201,6 +201,17 @@ class FunkinLua
 
 		// build target (windows, mac, linux, etc.)
 		set('buildTarget', LuaUtils.getBuildTarget());
+		// modchart related
+		set("ModManager", modchart.ModManager);
+		set("SubModifier", modchart.SubModifier);
+		set("NoteModifier", modchart.NoteModifier);
+		set("EventTimeline", modchart.EventTimeline);
+		set("Modifier", modchart.Modifier);
+		set("StepCallbackEvent", modchart.events.StepCallbackEvent);
+		set("CallbackEvent", modchart.events.CallbackEvent);
+		set("ModEvent", modchart.events.ModEvent);
+		set("EaseEvent", modchart.events.EaseEvent);
+		set("SetEvent", modchart.events.SetEvent);
 
 		//
 		Lua_helper.add_callback(lua, "getRunningScripts", function()

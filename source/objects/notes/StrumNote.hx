@@ -3,13 +3,14 @@ package objects.notes;
 import backend.animation.PsychAnimationController;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
+import math.Vector3;
 
 class StrumNote extends FlxSprite
 {
 	public var rgbShader:RGBShaderReference;
 	public var resetAnim:Float = 0;
 
-	private var noteData:Int = 0;
+	public var noteData:Int = 0;
 
 	public var direction:Float = 90;
 	public var downScroll:Bool = false;
@@ -17,6 +18,8 @@ class StrumNote extends FlxSprite
 
 	private var player:Int;
 
+	public var vec3Cache:Vector3 = new Vector3(); // for vector3 operations in modchart code
+	public var defScale:FlxPoint = FlxPoint.get(); // for modcharts to keep the scaling
 	public var texture(default, set):String = null;
 
 	private function set_texture(value:String):String

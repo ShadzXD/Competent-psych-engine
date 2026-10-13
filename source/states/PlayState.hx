@@ -39,6 +39,7 @@ import objects.huds.*;
 import backend.Scoring;
 import objects.RatingPopUp;
 import backend.Rating;
+import modchart.*;
 #if LUA_ALLOWED
 import psychlua.*;
 #else
@@ -275,6 +276,8 @@ class PlayState extends MusicBeatState
 	 * Whether the song uses opponent vocals.
 	 */
 	var hasOpponentVoices:Bool = false;
+
+	public var modManager:ModManager;
 
 	override public function create()
 	{
@@ -518,6 +521,8 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
 
 		generateSong();
+		modManager = new ModManager(this);
+		setOnScripts('modManager', modManager);
 
 		add(grpHoldSplashes);
 
@@ -1022,7 +1027,12 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-
+			modManager.receptors = [playerStrumline.members, opponentStrumline.members];
+			modManager.lanes = strumlines.length;
+			callOnScripts('preModifierRegister', []);
+			modManager.registerEssentialModifiers();
+			modManager.registerDefaultModifiers();
+			callOnScripts('postModifierRegister', []);
 			startedCountdown = true;
 			Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
 			setOnScripts('startedCountdown', true);
@@ -1821,7 +1831,8 @@ class PlayState extends MusicBeatState
 			trace("RESET = True");
 		}
 		doDeathCheck();
-
+		modManager.updateTimeline(curDecStep);
+		modManager.update(elapsed);
 		if (unspawnNotes[0] != null)
 		{
 			var time:Float = spawnTime * playbackRate;
@@ -1849,7 +1860,24 @@ class PlayState extends MusicBeatState
 				unspawnNotes.splice(index, 1);
 			}
 		}
+		if (startedCountdown)
+		{
+			opponentStrumline.forEachAlive(function(strum:StrumNote)
+			{
+				var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 1, strum, [], strum.vec3Cache);
+				modManager.updateObject(curDecBeat, strum, pos, 1);
+				strum.x = pos.x;
+				strum.y = pos.y;
+			});
 
+			opponentStrumline.forEachAlive(function(strum:StrumNote)
+			{
+				var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 0, strum, [], strum.vec3Cache);
+				modManager.updateObject(curDecBeat, strum, pos, 0);
+				strum.x = pos.x;
+				strum.y = pos.y;
+			});
+		}
 		if (generatedMusic)
 		{
 			if (!inCutscene)
@@ -1870,7 +1898,12 @@ class PlayState extends MusicBeatState
 							var daNote:Note = notes.members[i];
 							if (daNote == null)
 								continue;
+							final visPos = -(1 * songSpeed);
 
+							final pos = modManager.getPos(daNote.strumTime, visPos, daNote.strumTime - Conductor.songPosition, curDecBeat, daNote.noteData,
+								daNote.noteData, daNote, null, daNote.vec3Cache);
+
+							modManager.updateObject(curDecBeat, daNote, pos, daNote.noteData);
 							var curStrum:StrumLine = getStrumlineNote(daNote);
 
 							daNote.cameras = curStrum.cameras;
