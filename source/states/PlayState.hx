@@ -294,17 +294,14 @@ class PlayState extends MusicBeatState
 		instance = this;
 
 		PauseSubState.songName = null; // Reset to default
-		playbackRate = ClientPrefs.getGameplaySetting('songspeed');
 
 		keysArray = ['note_left', 'note_down', 'note_up', 'note_right'];
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
-		if (!isStoryMode)
-		{
-			// Gameplay modifiers
-			updateGameplayModifiers();
-		}
+
+		// Gameplay modifiers
+		updateGameplayModifiers();
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = initPsychCamera();
@@ -1635,6 +1632,7 @@ class PlayState extends MusicBeatState
 				tmr.active = true);
 			FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
 				twn.active = true);
+			updateGameplayModifiers();
 
 			paused = false;
 			callOnScripts('onResume');
@@ -3015,7 +3013,6 @@ class PlayState extends MusicBeatState
 		camZooming = true;
 		if (!hasOpponentVoices)
 			vocals.volume = 1;
-		strumline.playConfirmAnim(Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 		note.hitByOpponent = true;
 		stagesFunc(function(stage:BaseStage) stage.opponentNoteHit(note));
 		var result:Dynamic = callOnLuas('opponentNoteHit', [
@@ -3060,9 +3057,7 @@ class PlayState extends MusicBeatState
 			// kind of busted but it works
 			if (!cpuControlled && note.strumline == -1)
 			{
-				var spr = strumline.members[note.noteData];
-				if (spr != null)
-					spr.playAnim('confirm', true);
+				strumline.playConfirmAnim(Std.int(Math.abs(note.noteData)));
 			}
 			else
 				strumline.playConfirmAnim(Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
@@ -3763,11 +3758,23 @@ class PlayState extends MusicBeatState
 
 	public function updateGameplayModifiers()
 	{
+		if (isStoryMode)
+			return;
 		healthGain = ClientPrefs.getGameplaySetting('healthgain');
 		healthLoss = ClientPrefs.getGameplaySetting('healthloss');
 		instakillOnMiss = ClientPrefs.getGameplaySetting('instakill');
 		practiceMode = ClientPrefs.getGameplaySetting('practice');
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay');
+		playbackRate = ClientPrefs.getGameplaySetting('songspeed');
+		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype');
+		switch (songSpeedType)
+		{
+			case "multiplicative":
+				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed');
+			case "constant":
+				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed');
+		}
+
 		botPlayStuff();
 	}
 

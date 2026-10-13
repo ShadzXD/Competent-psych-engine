@@ -51,10 +51,12 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 		}
 	}
 
-	public function playConfirmAnim(id:Int, time:Float)
+	public function playConfirmAnim(id:Int, time:Float = -1)
 	{
 		this.members[id].playAnim('confirm', true);
-		this.members[id].resetAnim = time;
+		// dont resetanim if time is -1
+		if (time >= 0)
+			this.members[id].resetAnim = time;
 	}
 
 	public function updateChars(oldChar:Character, newChar:Character)

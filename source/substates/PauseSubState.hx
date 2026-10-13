@@ -169,13 +169,6 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function close()
 	{
-		if (openedGameplayChangers)
-		{
-			PlayState.instance.updateGameplayModifiers();
-			// not gonna try with this rn, too much stuff to do!
-			// PlayState.startOnTime = curTime;
-			// restartSong(true);
-		}
 		super.close();
 	}
 
