@@ -3013,6 +3013,8 @@ class PlayState extends MusicBeatState
 		camZooming = true;
 		if (!hasOpponentVoices)
 			vocals.volume = 1;
+		strumline.playConfirmAnim(Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+
 		note.hitByOpponent = true;
 		stagesFunc(function(stage:BaseStage) stage.opponentNoteHit(note));
 		var result:Dynamic = callOnLuas('opponentNoteHit', [
