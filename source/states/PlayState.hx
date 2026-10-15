@@ -1835,9 +1835,10 @@ class PlayState extends MusicBeatState
 				var dunceNote:Note = unspawnNotes[0];
 				notes.insert(0, dunceNote);
 				dunceNote.spawned = true;
-
+				
+				// dunceNote was just inserted at index 0; no need to indexOf.
 				callOnLuas('onSpawnNote', [
-					notes.members.indexOf(dunceNote),
+					0,
 					dunceNote.noteData,
 					dunceNote.noteType,
 					dunceNote.isSustainNote,
@@ -1845,8 +1846,8 @@ class PlayState extends MusicBeatState
 				]);
 				callOnHScript('onSpawnNote', [dunceNote]);
 
-				var index:Int = unspawnNotes.indexOf(dunceNote);
-				unspawnNotes.splice(index, 1);
+				// dunceNote == unspawnNotes[0]; shift is O(n) but skips an indexOf scan.
+				unspawnNotes.shift();
 			}
 		}
 
@@ -3163,7 +3164,7 @@ class PlayState extends MusicBeatState
 
 		spawnHoldSplashOnNote(note, strumline);
 	}
-
+	//todo: add note camera movement
 	public function noteCameraMovement(_x:Float, _y:Float)
 	{
 	}
@@ -3193,7 +3194,7 @@ class PlayState extends MusicBeatState
 		splash.spawnSplashNote(x, y, data, note);
 		grpNoteSplashes.add(splash);
 	}
-
+	//todo: rework this, its desperately needed.
 	public function spawnHoldSplashOnNote(note:Note, strumline:StrumLine)
 	{
 		if (!note.isSustainNote && note.tail.length != 0 && note.tail[note.tail.length - 1].extraData['holdSplash'] == null)
