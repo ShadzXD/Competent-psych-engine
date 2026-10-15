@@ -72,7 +72,7 @@ import crowplexus.hscript.Printer;
 **/
 class PlayState extends MusicBeatState
 {
-	//todo; remove this
+	// todo; remove this
 	public static var STRUM_X = 48.5;
 	public static var STRUM_X_MIDDLESCROLL = -271.5;
 
@@ -151,8 +151,8 @@ class PlayState extends MusicBeatState
 	public var camFollow:FlxObject;
 
 	private static var prevCamFollow:FlxObject;
-	
-	public var strumlines:FlxTypedGroup<StrumLine> = new FlxTypedGroup<StrumLine>();	//todo: rename this to grpStrumlines , mayb?
+
+	public var strumlines:FlxTypedGroup<StrumLine> = new FlxTypedGroup<StrumLine>(); // todo: rename this to grpStrumlines , mayb?
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash> = new FlxTypedGroup<NoteSplash>();
 	public var grpHoldSplashes:FlxTypedGroup<SustainSplash> = new FlxTypedGroup<SustainSplash>();
 
@@ -407,7 +407,7 @@ class PlayState extends MusicBeatState
 		if (isPixelStage)
 			introSoundsSuffix = '-pixel';
 
-		noteSkinData = new NoteSkinData('funkin');
+		noteSkinData = new NoteSkinData('pro');
 		add(noteSkinData);
 
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
@@ -1841,7 +1841,7 @@ class PlayState extends MusicBeatState
 				var dunceNote:Note = unspawnNotes[0];
 				notes.insert(0, dunceNote);
 				dunceNote.spawned = true;
-				
+
 				// dunceNote was just inserted at index 0; no need to indexOf.
 				callOnLuas('onSpawnNote', [
 					0,
@@ -1875,11 +1875,12 @@ class PlayState extends MusicBeatState
 						while (i < notes.length)
 						{
 							var daNote:Note = notes.members[i];
-							if (daNote == null) {
+							if (daNote == null)
+							{
 								i++;
 								continue;
 							}
-							//todo: custom strumline support that redirects notes instantly, mayb
+							// todo: custom strumline support that redirects notes instantly, mayb
 							var curStrum:StrumLine = getStrumlineNote(daNote);
 
 							daNote.cameras = curStrum.cameras;
@@ -3170,7 +3171,8 @@ class PlayState extends MusicBeatState
 
 		spawnHoldSplashOnNote(note, strumline);
 	}
-	//todo: add note camera movement
+
+	// todo: add note camera movement
 	public function noteCameraMovement(_x:Float, _y:Float)
 	{
 	}
@@ -3200,7 +3202,8 @@ class PlayState extends MusicBeatState
 		splash.spawnSplashNote(x, y, data, note);
 		grpNoteSplashes.add(splash);
 	}
-	//todo: rework this, its desperately needed.
+
+	// todo: rework this, its desperately needed.
 	public function spawnHoldSplashOnNote(note:Note, strumline:StrumLine)
 	{
 		if (!note.isSustainNote && note.tail.length != 0 && note.tail[note.tail.length - 1].extraData['holdSplash'] == null)

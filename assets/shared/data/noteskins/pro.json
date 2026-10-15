@@ -1,0 +1,8 @@
+{
+    "strum_skin": "noteSkins/NOTE_assets-future",
+    "note_skin": "noteSkins/NOTE_assets-future",
+    "note_splash_skin": "noteSplashes/noteSplashes-diamond",
+    "hold_splash_skin": "noteSplashes/holdSplashes",
+    "antialiasing": true,
+    "rgb": true
+}
