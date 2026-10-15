@@ -207,7 +207,8 @@ class Note extends FlxSprite
 
 	private function set_noteType(value:String):String
 	{
-		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes/noteSplashes';
+		////?????? why are the notesplashes set here ohmyg
+		noteSplashData.texture = PlayState.instance != null ? PlayState.instance.noteSkinData.noteSplashSkin : 'noteSplashes/noteSplashes';
 		defaultRGB();
 
 		if (noteData > -1 && noteType != value)
@@ -397,12 +398,10 @@ class Note extends FlxSprite
 		var skin:String = texture + postfix;
 		if (texture.length < 1)
 		{
-			skin = PlayState.SONG != null ? PlayState.SONG.arrowSkin : null;
-			if (skin == null || skin.length < 1)
-				skin = defaultNoteSkin + postfix;
+			skin = PlayState.SONG != null && PlayState.instance.noteSkinData != null ? PlayState.instance.noteSkinData.noteSkin : null;
 		}
 		else
-			rgbShader.enabled = false;
+			rgbShader.enabled = false; // turn off rgb shader if note is null?
 
 		var animName:String = null;
 		if (animation.curAnim != null)
@@ -410,12 +409,10 @@ class Note extends FlxSprite
 			animName = animation.curAnim.name;
 		}
 
-		var skinPixel:String = skin;
 		var lastScaleY:Float = scale.y;
 		var skinPostfix:String = getNoteSkinPostfix();
 		var customSkin:String = skin + skinPostfix;
-		var path:String = PlayState.isPixelStage ? 'pixelUI/' : '';
-		if (customSkin == _lastValidChecked || Paths.fileExists('images/' + path + customSkin + '.png', IMAGE))
+		if (customSkin == _lastValidChecked || Paths.fileExists('images/' + customSkin + '.png', IMAGE))
 		{
 			skin = customSkin;
 			_lastValidChecked = customSkin;
@@ -423,39 +420,12 @@ class Note extends FlxSprite
 		else
 			skinPostfix = '';
 
-		if (PlayState.isPixelStage)
+		frames = Paths.getSparrowAtlas(skin);
+		loadNoteAnims();
+		if (!isSustainNote)
 		{
-			if (isSustainNote)
-			{
-				var graphic = Paths.image('pixelUI/' + skinPixel + 'ENDS' + skinPostfix);
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 2));
-				originalHeight = graphic.height / 2;
-			}
-			else
-			{
-				var graphic = Paths.image('pixelUI/' + skinPixel + skinPostfix);
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
-			}
-			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
-			loadPixelNoteAnims();
-			antialiasing = false;
-
-			if (isSustainNote)
-			{
-				offsetX += _lastNoteOffX;
-				_lastNoteOffX = (width - 7) * (PlayState.daPixelZoom / 2);
-				offsetX -= _lastNoteOffX;
-			}
-		}
-		else
-		{
-			frames = Paths.getSparrowAtlas(skin);
-			loadNoteAnims();
-			if (!isSustainNote)
-			{
-				centerOffsets();
-				centerOrigin();
-			}
+			centerOffsets();
+			centerOrigin();
 		}
 
 		if (isSustainNote)

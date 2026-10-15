@@ -1,5 +1,6 @@
 package states;
 
+import backend.NoteSkinData;
 import backend.Highscore;
 import backend.StageData;
 import backend.WeekData;
@@ -39,6 +40,7 @@ import objects.huds.*;
 import backend.Scoring;
 import objects.RatingPopUp;
 import backend.Rating;
+import backend.NoteSkinData;
 #if LUA_ALLOWED
 import psychlua.*;
 #else
@@ -264,6 +266,7 @@ class PlayState extends MusicBeatState
 	// HUD Class Objects
 	public var hudClass:MainHUD;
 	public var ratingClass:RatingPopUp;
+	public var noteSkinData:NoteSkinData;
 
 	/**
 	 * Whether you want to use the normal Health variable.
@@ -403,6 +406,9 @@ class PlayState extends MusicBeatState
 		}
 		if (isPixelStage)
 			introSoundsSuffix = '-pixel';
+
+		noteSkinData = new NoteSkinData('funkin');
+		add(noteSkinData);
 
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();

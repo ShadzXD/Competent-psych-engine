@@ -97,7 +97,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		antialiasing = json.antialiasing;
 		uiSuffix = json.pathSuffix != null ? json.path_suffix : '';
 	}
-	pub
+	
 	public function displayCombo(?combo:Int = 0)
 	{
 		var seperatedScore:Array<Int> = [];

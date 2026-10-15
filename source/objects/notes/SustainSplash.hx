@@ -6,17 +6,16 @@ class SustainSplash extends FlxSprite
 	public static var frameRate:Int;
 
 	public var strumNote:StrumNote;
-	public var skin:String = 'holdSplash';
+	public var skin:String = 'noteSplashes/holdSplashes';
 
 	public function new():Void
 	{
 		super();
-		if (PlayState.SONG != null
-			&& PlayState.SONG.holdSplashSkin != null
-			&& PlayState.SONG.holdSplashSkin.length > 0
-			&& Paths.getSparrowAtlas('noteSplashes/' + PlayState.SONG.holdSplashSkin) != null)
-			skin = PlayState.SONG.holdSplashSkin;
-		frames = Paths.getSparrowAtlas('noteSplashes/$skin');
+		if (PlayState.instance.noteSkinData != null
+			&& PlayState.instance.noteSkinData.sustainSplashSkin != null
+			&& PlayState.instance.noteSkinData.sustainSplashSkin.length > 0)
+			skin = PlayState.instance.noteSkinData.sustainSplashSkin;
+		frames = Paths.getSparrowAtlas(skin);
 		animation.addByPrefix('start', 'start', 16, false);
 		animation.addByPrefix('hold', 'hold', 18, true);
 		animation.addByPrefix('end', 'end', 24, false);
@@ -39,7 +38,7 @@ class SustainSplash extends FlxSprite
 	function repositionSplash()
 	{
 		setPosition(strumNote.x, strumNote.y);
-		offset.set(PlayState.isPixelStage ? 112.5 : 106.25, 100);
+		offset.set(106.25, 100);
 	}
 
 	public function setupSusSplash(strum:StrumNote, daNote:Note, ?playbackRate:Float = 1):Void
