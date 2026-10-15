@@ -70,6 +70,7 @@ import crowplexus.hscript.Printer;
 **/
 class PlayState extends MusicBeatState
 {
+	//todo; remove this
 	public static var STRUM_X = 48.5;
 	public static var STRUM_X_MIDDLESCROLL = -271.5;
 
@@ -148,13 +149,12 @@ class PlayState extends MusicBeatState
 	public var camFollow:FlxObject;
 
 	private static var prevCamFollow:FlxObject;
-
-	public var strumlines:FlxTypedGroup<StrumLine> = new FlxTypedGroup<StrumLine>();
+	
+	public var strumlines:FlxTypedGroup<StrumLine> = new FlxTypedGroup<StrumLine>();	//todo: rename this to grpStrumlines , mayb?
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash> = new FlxTypedGroup<NoteSplash>();
 	public var grpHoldSplashes:FlxTypedGroup<SustainSplash> = new FlxTypedGroup<SustainSplash>();
 
 	public var playerStrumline:StrumLine;
-
 	public var opponentStrumline:StrumLine;
 
 	public var camZooming:Bool = false;
@@ -1868,9 +1868,11 @@ class PlayState extends MusicBeatState
 						while (i < notes.length)
 						{
 							var daNote:Note = notes.members[i];
-							if (daNote == null)
+							if (daNote == null) {
+								i++;
 								continue;
-
+							}
+							//todo: custom strumline support that redirects notes instantly, mayb
 							var curStrum:StrumLine = getStrumlineNote(daNote);
 
 							daNote.cameras = curStrum.cameras;
