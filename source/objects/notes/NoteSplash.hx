@@ -335,8 +335,8 @@ class NoteSplash extends FlxSprite
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
-		if (PlayState.instance.noteSkinData.antialiasing == false && config.allowPixel)
-			antialiasing = false;
+		if (PlayState.instance != null && PlayState.instance.noteSkinData != null)
+			visible = PlayState.instance.noteSkinData.useNoteSplash;
 
 		var minFps:Int = 22;
 		var maxFps:Int = 26;

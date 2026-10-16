@@ -398,10 +398,11 @@ class Note extends FlxSprite
 		var skin:String = texture + postfix;
 		if (texture.length < 1)
 		{
-			skin = PlayState.SONG != null && PlayState.instance.noteSkinData != null ? PlayState.instance.noteSkinData.noteSkin : null;
+			skin = PlayState.instance != null
+				&& PlayState.instance.noteSkinData != null ? PlayState.instance.noteSkinData.noteSkin : defaultNoteSkin;
 		}
 		else
-			rgbShader.enabled = false; // turn off rgb shader if note is null?
+			rgbShader.enabled = false; // turn off rgb shader if note is null
 
 		var animName:String = null;
 		if (animation.curAnim != null)

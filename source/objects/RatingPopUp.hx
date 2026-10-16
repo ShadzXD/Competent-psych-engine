@@ -3,7 +3,8 @@ package objects;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import backend.Rating;
 import haxe.Json;
-//todo: add rating recycling
+
+// todo: add rating recycling
 typedef RatingFile =
 {
 	var path_prefix:String;
@@ -80,7 +81,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 			FlxTween.tween(rating, {alpha: 0}, 0.2 / speedRate, {
 				onComplete: function(tween:FlxTween)
 				{
-					remove(rating);
+					// remove(rating);
 					rating.destroy();
 				},
 				startDelay: Conductor.crochet * 0.001 / speedRate
@@ -97,7 +98,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 		antialiasing = json.antialiasing;
 		uiSuffix = json.pathSuffix != null ? json.path_suffix : '';
 	}
-	
+
 	public function displayCombo(?combo:Int = 0)
 	{
 		var seperatedScore:Array<Int> = [];
@@ -133,7 +134,7 @@ class RatingPopUp extends FlxTypedGroup<FlxSprite>
 				FlxTween.tween(numScore, {alpha: 0}, 0.2 / speedRate, {
 					onComplete: function(tween:FlxTween)
 					{
-						remove(numScore);
+						// remove(numScore);
 						numScore.destroy();
 					},
 					startDelay: Conductor.crochet * 0.002 / speedRate

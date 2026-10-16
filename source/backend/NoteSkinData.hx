@@ -10,21 +10,21 @@ typedef NoteSkin =
 	var note_skin:String;
 	var note_splash_skin:String;
 	var sustain_splash_skin:String;
-	var antialiasing:Bool;
-	var rgb:Bool;
-	@:optional var pixel_shader:Int;
+
+	@:optional var allow_note_splash:Bool;
+	@:optional var allow_sustain_splash:Bool;
 }
 
 class NoteSkinData extends FlxBasic
 {
+	public var hudType:String;
+
 	public var strumSkin:String;
 	public var noteSkin:String;
 	public var noteSplashSkin:String;
 	public var sustainSplashSkin:String;
-	public var hudType:String;
-	public var antialiasing:Bool;
-	public var useRGB:Bool = true;
-	public var pixelShaderValue:Int;
+	public var useNoteSplash:Bool = true;
+	public var useSustainSplash:Bool = true;
 
 	public function new(hud:String)
 	{
@@ -50,8 +50,7 @@ class NoteSkinData extends FlxBasic
 		noteSkin = json.note_skin;
 		noteSplashSkin = json.note_splash_skin;
 		sustainSplashSkin = json.sustain_splash_skin;
-		antialiasing = json.antialiasing;
-		useRGB = json.rgb;
-		pixelShaderValue = json.pixel_shader;
+		useNoteSplash = json.allow_note_splash == null ? true : json.allow_note_splash;
+		useSustainSplash = json.allow_sustain_splash == null ? true : json.allow_sustain_splash;
 	}
 }

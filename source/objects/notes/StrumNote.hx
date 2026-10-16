@@ -37,7 +37,7 @@ class StrumNote extends FlxSprite
 
 		rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
 		rgbShader.enabled = false;
-		if (PlayState.SONG != null && (PlayState.SONG.disableNoteRGB || !PlayState.instance.noteSkinData.useRGB))
+		if (PlayState.SONG != null && PlayState.SONG.disableNoteRGB)
 			useRGBShader = false;
 
 		var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[leData];
@@ -61,10 +61,10 @@ class StrumNote extends FlxSprite
 		super(x, y);
 
 		var skin:String = null;
-		if (PlayState.SONG != null && PlayState.instance.noteSkinData != null)
+		if (PlayState.instance != null && PlayState.instance.noteSkinData != null)
 			skin = PlayState.instance.noteSkinData.strumSkin;
-		// else
-		//	skin = Note.defaultNoteSkin;
+		else
+			skin = Note.defaultNoteSkin;
 
 		texture = skin; // Load texture and anims
 
