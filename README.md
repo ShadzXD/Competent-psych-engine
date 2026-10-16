@@ -5,19 +5,20 @@ Competent! Psych Engine
 
 <img width="1286" height="730" alt="incompetent" src="https://github.com/user-attachments/assets/62e0d9e4-bc74-420e-beb7-a634ab0a7843" />
 
+
 Competent! Psych engine is a fork of Psych engine v1.0.4 that aims to fix multiple bugs and make modding easier for the average source code modder.
 
 My third, and hopefully final Psych Engine fork. Please note that this engine is a major W.I.P and has many bugs.
 
-New Features
+Changes
 ===========
 - Libraries have been updated to newer versions.
 - Multiple Bug Fixes to base psych engine.
-- Better playstate architecture (moving strumlines, hud, ratings out of playstate)
+- Better playstate architecture (moving strumlines, hud and ratings out of playstate).
 - HTML5 Support (W.I.P)
 - Reorganized asset file paths.
 - Better visual Parity with newer Base game.
-- JSON driven hud systems
+- JSON driven hud systems.
 
 
 Special Thanks:
