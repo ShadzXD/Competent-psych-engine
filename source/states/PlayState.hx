@@ -2881,6 +2881,7 @@ class PlayState extends MusicBeatState
 				for (n in notes)
 				{ // I can't do a filter here, that's kinda awesome
 					var canHit:Bool = (n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit);
+					canHit = canHit && n.parent != null && n.parent.wasGoodHit;
 
 					if (canHit && n.isSustainNote)
 					{
@@ -2953,6 +2954,55 @@ class PlayState extends MusicBeatState
 		var subtract:Float = pressMissDamage;
 		if (note != null)
 			subtract = note.missHealth;
+		// GUITAR HERO SUSTAIN CHECK LOL!!!!
+		if (note != null && note.parent == null)
+		{
+			if (note.tail.length > 0)
+			{
+				note.alpha = 0.35;
+				note.multAlpha = 0.35;
+
+				for (childNote in note.tail)
+				{
+					childNote.alpha = note.alpha;
+					childNote.multAlpha = note.multAlpha;
+					childNote.missed = true;
+					childNote.canBeHit = false;
+					childNote.ignoreNote = true;
+					childNote.tooLate = true;
+				}
+				note.missed = true;
+				note.canBeHit = false;
+
+				// subtract += 0.385; // you take more damage if playing with this gameplay changer enabled.
+				// i mean its fair :p -Crow
+				subtract *= note.tail.length + 1;
+				// i think it would be fair if damage multiplied based on how long the sustain is -[REDACTED]
+			}
+
+			if (note.missed)
+				return;
+		}
+		if (note != null && note.parent != null && note.isSustainNote)
+		{
+			if (note.missed)
+				return;
+
+			var parentNote:Note = note.parent;
+			if (parentNote.wasGoodHit && parentNote.tail.length > 0)
+			{
+				for (child in parentNote.tail)
+					if (child != note)
+					{
+						note.alpha = 0.35;
+						note.multAlpha = 0.35;
+						child.missed = true;
+						child.canBeHit = false;
+						child.ignoreNote = true;
+						child.tooLate = true;
+					}
+			}
+		}
 
 		if (instakillOnMiss)
 		{
