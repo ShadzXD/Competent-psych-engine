@@ -70,8 +70,10 @@ class NoteSplash extends FlxSprite
 		if (splash == null)
 		{
 			splash = defaultNoteSplash + getSplashSkinPostfix();
-			if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
-				splash = PlayState.SONG.splashSkin;
+			if (PlayState.instance != null
+				&& PlayState.instance.noteSkinData != null
+				&& PlayState.instance.noteSkinData.noteSplashSkin.length > 0)
+				splash = PlayState.instance.noteSkinData.noteSplashSkin;
 		}
 
 		texture = splash;
@@ -210,8 +212,8 @@ class NoteSplash extends FlxSprite
 			var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
 			if (note != null && note.noteSplashData.texture != null)
 				loadedTexture = note.noteSplashData.texture;
-			else if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
-				loadedTexture = PlayState.SONG.splashSkin;
+			else if (PlayState.instance.noteSkinData != null && PlayState.instance.noteSkinData.noteSplashSkin.length > 0)
+				loadedTexture = PlayState.instance.noteSkinData.noteSplashSkin;
 
 			if (texture != loadedTexture)
 				loadSplash(loadedTexture);
@@ -333,8 +335,8 @@ class NoteSplash extends FlxSprite
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
-		if (PlayState.isPixelStage && config.allowPixel)
-			antialiasing = false;
+		if (PlayState.instance != null && PlayState.instance.noteSkinData != null)
+			visible = PlayState.instance.noteSkinData.useNoteSplash;
 
 		var minFps:Int = 22;
 		var maxFps:Int = 26;

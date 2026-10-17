@@ -1,0 +1,8 @@
+{
+    "strum_skin": "noteSkins/strums",
+    "note_skin": "noteSkins/notes",
+    "note_splash_skin": "noteSplashes/noteSplashes",
+    "hold_splash_skin": "noteSplashes/holdSplashes",
+    "antialiasing": true,
+    "rgb": true
+}

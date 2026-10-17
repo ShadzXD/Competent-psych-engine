@@ -689,8 +689,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		noRGBCheckBox.checked = (PlayState.SONG.disableNoteRGB == true);
 
-		noteTextureInputText.text = PlayState.SONG.arrowSkin;
-		noteSplashesInputText.text = PlayState.SONG.splashSkin;
+		// noteTextureInputText.text = PlayState.SONG.arrowSkin;
 	}
 
 	var noteSelectionSine:Float = 0;
@@ -2588,7 +2587,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var gameOverRetryInputText:PsychUIInputText;
 	var noRGBCheckBox:PsychUICheckBox;
 	var noteTextureInputText:PsychUIInputText;
-	var noteSplashesInputText:PsychUIInputText;
 
 	function addDataTab()
 	{
@@ -2636,12 +2634,13 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		noteTextureInputText.unfocus = function()
 		{
 			var changed:Bool = false;
-			if (PlayState.SONG.arrowSkin != noteTextureInputText.text)
-				changed = true;
-			PlayState.SONG.arrowSkin = noteTextureInputText.text.trim();
-			if (PlayState.SONG.arrowSkin.trim().length < 1)
-				PlayState.SONG.arrowSkin = null;
-
+			/*
+				if (PlayState.SONG.arrowSkin != noteTextureInputText.text)
+					changed = true;
+				PlayState.SONG.arrowSkin = noteTextureInputText.text.trim();
+				if (PlayState.SONG.arrowSkin.trim().length < 1)
+					PlayState.SONG.arrowSkin = null;
+			 */
 			if (changed)
 			{
 				var textureLoad:String = 'images/${noteTextureInputText.text}.png';
@@ -2670,14 +2669,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			}
 		};
 
-		noteSplashesInputText = new PsychUIInputText(objX + 140, objY, 120, '');
-		noteSplashesInputText.onChange = function(old:String, cur:String)
-		{
-			PlayState.SONG.splashSkin = cur;
-			if (cur.trim().length < 1)
-				PlayState.SONG.splashSkin = null;
-		}
-
 		tab_group.add(new FlxText(gameOverCharDropDown.x, gameOverCharDropDown.y - 15, 120, 'Game Over Character:'));
 		tab_group.add(new FlxText(gameOverSndInputText.x, gameOverSndInputText.y - 15, 180, 'Game Over Death Sound (sounds/):'));
 		tab_group.add(new FlxText(gameOverLoopInputText.x, gameOverLoopInputText.y - 15, 180, 'Game Over Loop Music (music/):'));
@@ -2688,9 +2679,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		tab_group.add(noRGBCheckBox);
 
 		tab_group.add(new FlxText(noteTextureInputText.x, noteTextureInputText.y - 15, 100, 'Note Texture:'));
-		tab_group.add(new FlxText(noteSplashesInputText.x, noteSplashesInputText.y - 15, 120, 'Note Splashes Texture:'));
 		tab_group.add(noteTextureInputText);
-		tab_group.add(noteSplashesInputText);
 
 		tab_group.add(gameOverCharDropDown); // lowest priority to display properly
 	}

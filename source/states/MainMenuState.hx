@@ -303,12 +303,7 @@ class MainMenuState extends MusicBeatState
 						case 'options':
 							MusicBeatState.switchState(new OptionsState());
 							OptionsState.onPlayState = false;
-							if (PlayState.SONG != null)
-							{
-								PlayState.SONG.arrowSkin = null;
-								PlayState.SONG.splashSkin = null;
-								PlayState.stageUI = 'normal';
-							}
+
 						default:
 							trace('Menu Item ${option} doesn\'t do anything');
 							selectedSomethin = false;
