@@ -456,30 +456,32 @@ class LoadingState extends MusicBeatState
 		{
 			try
 			{
-				var noteSkin:String = Note.defaultNoteSkin;
-				if (song.arrowSkin != null && song.arrowSkin.length > 1)
-					noteSkin = song.arrowSkin;
-				var customSkin:String = noteSkin + Note.getNoteSkinPostfix();
-				if (Paths.fileExists('images/$customSkin.png', IMAGE))
-					noteSkin = customSkin;
-				imagesToPrepare.push(noteSkin);
+				/*
+					var noteSkin:String = Note.defaultNoteSkin;
+					if (song.arrowSkin != null && song.arrowSkin.length > 1)
+						noteSkin = song.arrowSkin;
+					var customSkin:String = noteSkin + Note.getNoteSkinPostfix();
+					if (Paths.fileExists('images/$customSkin.png', IMAGE))
+						noteSkin = customSkin;
+					imagesToPrepare.push(noteSkin);
 
-				var noteSplash:String = NoteSplash.defaultNoteSplash;
-				if (song.splashSkin != null && song.splashSkin.length > 0)
-					noteSplash = song.splashSkin;
-				else
-					noteSplash += NoteSplash.getSplashSkinPostfix();
+					var noteSplash:String = NoteSplash.defaultNoteSplash;
+					if (song.splashSkin != null && song.splashSkin.length > 0)
+						noteSplash = song.splashSkin;
+					else
+						noteSplash += NoteSplash.getSplashSkinPostfix();
 
-				imagesToPrepare.push(noteSplash);
+					imagesToPrepare.push(noteSplash);
 
-				var holdSplash:String = 'noteSplashes/holdSplash';
+					var holdSplash:String = 'noteSplashes/holdSplash';
 
-				if (PlayState.SONG.holdSplashSkin != null
-					&& PlayState.SONG.holdSplashSkin.length > 0
-					&& Paths.getSparrowAtlas('noteSplashes/' + PlayState.SONG.holdSplashSkin) != null)
-					holdSplash = 'noteSplashes/' + PlayState.SONG.holdSplashSkin;
+					if (PlayState.SONG.holdSplashSkin != null
+						&& PlayState.SONG.holdSplashSkin.length > 0
+						&& Paths.getSparrowAtlas('noteSplashes/' + PlayState.SONG.holdSplashSkin) != null)
+						holdSplash = 'noteSplashes/' + PlayState.SONG.holdSplashSkin;
 
-				imagesToPrepare.push(holdSplash);
+					imagesToPrepare.push(holdSplash);
+				 */
 				try
 				{
 					var path:String = Paths.json('$folder/preload');
