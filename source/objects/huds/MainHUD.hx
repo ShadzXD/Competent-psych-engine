@@ -78,10 +78,6 @@ class MainHUD extends FlxGroup
 				PlayState.instance.boyfriend.healthColorArray[2]));
 	}
 
-	public function doScoreBop():Void
-	{
-	}
-
 	public function healthStuff(h:Float)
 	{
 		healthValue = h;

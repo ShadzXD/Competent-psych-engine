@@ -12,8 +12,8 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 	 */
 	public var cpuControlled:Bool = false;
 
-	// keeping this here just in case i end up adding multi key (prob not)
-	public final noteAmount:Int = 6;
+	// keeping this here just in case i end up adding multi key
+	public var noteAmount:Int = 4;
 
 	/**
 	 * Whether the strumline should be hidden if the player is using middlescroll

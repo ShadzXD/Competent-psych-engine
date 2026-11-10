@@ -1199,9 +1199,6 @@ class PlayState extends MusicBeatState
 		if (ret == LuaUtils.Function_Stop)
 			return;
 
-		if (scoreBop && ClientPrefs.data.scoreZoom)
-			hudClass.doScoreBop();
-
 		hudClass.updateScore(miss, songScore, songMisses, ratingPercent);
 		callOnScripts('onUpdateScore', [miss]);
 	}

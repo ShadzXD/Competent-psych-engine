@@ -11,7 +11,6 @@ import objects.HealthIcon;
 @:access(states.PlayState)
 class PsychHUD extends MainHUD
 {
-	var scoreTxtTween:FlxTween;
 	var healthLerp:Float = 1;
 	var iconOffset:Int = 26;
 	var ratingName:String = '?';
@@ -72,8 +71,8 @@ class PsychHUD extends MainHUD
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		iconGroup.add(iconP2);
 
-		scoreText = new FlxText(0, healthBar.y + 42, FlxG.width, "", 21);
-		scoreText.setFormat(Paths.font(hudFont), 21, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreText = new FlxText(0, healthBar.y + 42, FlxG.width, "", 20);
+		scoreText.setFormat(Paths.font(hudFont), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreText.scrollFactor.set();
 		scoreText.borderSize = 1.75;
 		add(scoreText);
@@ -128,21 +127,6 @@ class PsychHUD extends MainHUD
 		// took this from doido teehee
 		scoreText.text = 'SCORE WONT SAVE';
 		scoreText.color = FlxColor.RED;
-	}
-
-	override public function doScoreBop():Void
-	{
-		if (scoreTxtTween != null)
-			scoreTxtTween.cancel();
-
-		scoreText.scale.x = 1.075;
-		scoreText.scale.y = 1.075;
-		scoreTxtTween = FlxTween.tween(scoreText.scale, {x: 1, y: 1}, 0.2, {
-			onComplete: function(twn:FlxTween)
-			{
-				scoreTxtTween = null;
-			}
-		});
 	}
 
 	override function beatHit(curBeat:Int)

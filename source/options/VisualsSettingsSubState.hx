@@ -31,10 +31,8 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		var option:Option = new Option('Camera Zooms', "If unchecked, the camera won't zoom in on a beat hit.", 'camZooms', BOOL);
 		addOption(option);
 
-		var option:Option = new Option('Score Text Grow on Hit', "If unchecked, disables the Score text growing\neverytime you hit a note.", 'scoreZoom', BOOL);
-		addOption(option);
-
-		var option:Option = new Option('Background Strumline Opacity', 'How much transparent the background behind the notes should be.', 'underlayOpacity', PERCENT);
+		var option:Option = new Option('Background Strumline Opacity', 'How much transparent the background behind the notes should be.', 'underlayOpacity',
+			PERCENT);
 		option.scrollSpeed = 1;
 		option.minValue = 0.0;
 		option.maxValue = 1;
@@ -59,7 +57,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		var option:Option = new Option('Combo Stacking',
 			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read", 'comboStacking', BOOL);
 		addOption(option);
-		//this doesnt even work on win 11 im pretty sure
+		// this doesnt even work on win 11 im pretty sure
 		#if windows
 		var option:Option = new Option('Window Dark Mode', "If unchecked, Game Window will be light mode (Requires game restart)", 'windowDarkMode', BOOL);
 		addOption(option);
