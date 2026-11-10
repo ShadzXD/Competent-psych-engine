@@ -1,8 +1,5 @@
 package objects.notes;
 
-/**
- * Code for the strumlines,
- */
 class StrumLine extends FlxTypedGroup<StrumNote>
 {
 	public var downScroll:Bool;
@@ -16,7 +13,7 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 	public var cpuControlled:Bool = false;
 
 	// keeping this here just in case i end up adding multi key (prob not)
-	public final noteAmount:Int = 4;
+	public final noteAmount:Int = 6;
 
 	/**
 	 * Whether the strumline should be hidden if the player is using middlescroll

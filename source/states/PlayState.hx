@@ -407,7 +407,7 @@ class PlayState extends MusicBeatState
 		if (isPixelStage)
 			introSoundsSuffix = '-pixel';
 
-		noteSkinData = new NoteSkinData('pro');
+		noteSkinData = new NoteSkinData('funkin');
 		add(noteSkinData);
 
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
