@@ -40,7 +40,9 @@ import objects.huds.*;
 import backend.Scoring;
 import objects.RatingPopUp;
 import backend.Rating;
+import modchart.*;
 import backend.NoteSkinData;
+import haxe.ds.Vector;
 #if LUA_ALLOWED
 import psychlua.*;
 #else
@@ -279,6 +281,14 @@ class PlayState extends MusicBeatState
 	 */
 	var hasOpponentVoices:Bool = false;
 
+	public var modManager:ModManager;
+	// might make this a map ngl
+	public var script_NOTEOffsets:Vector<FlxPoint>;
+	public var script_STRUMOffsets:Vector<FlxPoint>;
+	public var script_SUSTAINOffsets:Vector<FlxPoint>;
+	public var script_SUSTAINENDOffsets:Vector<FlxPoint>;
+	public var script_SPLASHOffsets:Vector<FlxPoint>;
+
 	override public function create()
 	{
 		// trace('Playback Rate: ' + playbackRate);
@@ -347,7 +357,20 @@ class PlayState extends MusicBeatState
 
 		var stageData:StageFile = StageData.getStageFile(curStage);
 		defaultCamZoom = stageData.defaultZoom;
+		script_NOTEOffsets = new Vector<FlxPoint>(4);
+		script_SUSTAINOffsets = new Vector<FlxPoint>(4);
+		script_SUSTAINENDOffsets = new Vector<FlxPoint>(4);
+		script_STRUMOffsets = new Vector<FlxPoint>(4);
+		script_SPLASHOffsets = new Vector<FlxPoint>(4);
 
+		for (i in 0...4)
+		{
+			script_NOTEOffsets[i] = new FlxPoint();
+			script_STRUMOffsets[i] = new FlxPoint();
+			script_SUSTAINOffsets[i] = new FlxPoint();
+			script_SUSTAINENDOffsets[i] = new FlxPoint();
+			script_SPLASHOffsets[i] = new FlxPoint();
+		}
 		stageUI = "normal";
 
 		BF_X = stageData.boyfriend[0];
@@ -524,7 +547,8 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
 
 		generateSong();
-
+		modManager = new ModManager(this);
+		setOnScripts("modManager", modManager);
 		add(grpHoldSplashes);
 
 		add(grpNoteSplashes);
@@ -1028,7 +1052,11 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-
+			modManager.receptors = [playerStrumline.members, opponentStrumline.members];
+			callOnScripts('preModifierRegister', []);
+			modManager.registerEssentialModifiers();
+			modManager.registerDefaultModifiers();
+			callOnScripts('postModifierRegister', []);
 			startedCountdown = true;
 			Conductor.songPosition = -Conductor.crochet * 5 + Conductor.offset;
 			setOnScripts('startedCountdown', true);
@@ -1824,7 +1852,8 @@ class PlayState extends MusicBeatState
 			trace("RESET = True");
 		}
 		doDeathCheck();
-
+		modManager.updateTimeline(curDecStep);
+		modManager.update(elapsed);
 		if (unspawnNotes[0] != null)
 		{
 			var time:Float = spawnTime * playbackRate;
@@ -1872,11 +1901,23 @@ class PlayState extends MusicBeatState
 						while (i < notes.length)
 						{
 							var daNote:Note = notes.members[i];
+
 							if (daNote == null)
 							{
 								i++;
 								continue;
 							}
+
+							final visPos = -((Conductor.visualPosition - daNote.visualTime) * songSpeed);
+							final pos = modManager.getPos(daNote.strumTime, visPos, daNote.strumTime - Conductor.songPosition, curDecBeat, daNote.noteData,
+								daNote.lane, daNote, null, daNote.vec3Cache);
+
+							modManager.updateObject(curDecBeat, daNote, pos, daNote.lane);
+							pos.x += daNote.offsetX;
+							pos.y += daNote.offsetY;
+							daNote.x = pos.x;
+							daNote.y = pos.y;
+
 							// todo: custom strumline support that redirects notes instantly, mayb
 							var curStrum:StrumLine = getStrumlineNote(daNote);
 
@@ -1922,7 +1963,26 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
+
 			checkEventNote();
+		}
+		if (startedCountdown)
+		{
+			opponentStrumline.forEachAlive(function(strum:StrumNote)
+			{
+				var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 1, strum, [], strum.vec3Cache);
+				modManager.updateObject(curDecBeat, strum, pos, 1);
+				strum.x = pos.x + script_STRUMOffsets[strum.noteData].x;
+				strum.y = pos.y + script_STRUMOffsets[strum.noteData].y;
+			});
+
+			playerStrumline.forEachAlive(function(strum:StrumNote)
+			{
+				var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 0, strum, [], strum.vec3Cache);
+				modManager.updateObject(curDecBeat, strum, pos, 0);
+				strum.x = pos.x + script_STRUMOffsets[strum.noteData].x;
+				strum.y = pos.y + script_STRUMOffsets[strum.noteData].y;
+			});
 		}
 
 		#if debug

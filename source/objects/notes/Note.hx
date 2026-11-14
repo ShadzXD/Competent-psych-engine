@@ -6,6 +6,7 @@ import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 import objects.notes.StrumNote;
 import flixel.math.FlxRect;
+import math.Vector3;
 
 using StringTools;
 
@@ -150,6 +151,46 @@ class Note extends FlxSprite
 	 */
 	public var strumline:Int = -1;
 
+	public static var quants:Array<Int> = [4, // quarter note
+		8, // eight
+		12, // etc
+		16, 20, 24, 32, 48, 64, 96, 192];
+
+	public var vec3Cache:Vector3 = new Vector3(); // for vector3 operations in modchart code
+	public var defScale:FlxPoint = FlxPoint.get(); // for modcharts to keep the scaling
+
+	public var mAngle:Float = 0;
+	public var bAngle:Float = 0;
+	public var visualTime:Float = 0;
+	public var typeOffsetX:Float = 0; // used to offset notes, mainly for note types. use in place of offset.x and offset.y when offsetting notetypes
+	public var typeOffsetY:Float = 0;
+	public var isQuant:Bool = false; // mainly for color swapping, so it changes color depending on which set (quants or regular notes)
+	public var canQuant:Bool = true;
+	public var lane:Int = 0;
+
+	public static function getQuant(beat:Float)
+	{
+		var row = Conductor.beatToNoteRow(beat);
+		for (data in quants)
+		{
+			if (row % (Conductor.ROWS_PER_MEASURE / data) == 0)
+			{
+				return data;
+			}
+		}
+		return quants[quants.length - 1]; // invalid
+	}
+
+	public var quant:Int = 4;
+
+	// i did nnot find these genuinely used?
+	// public var zIndex:Float = 0;
+	// public var desiredZIndex:Float = 0;
+	public var z:Float = 0;
+	public var garbage:Bool = false; // if this is true, the note will be removed in the next update cycle
+	public var alphaMod:Float = 1;
+	public var alphaMod2:Float = 1; // TODO: unhardcode this shit lmao
+
 	function get_hitsoundVolume():Float
 	{
 		if (ClientPrefs.data.hitsoundVolume > 0)
@@ -271,7 +312,16 @@ class Note extends FlxSprite
 		isSustainNote = sustainNote;
 		this.inEditor = inEditor;
 		this.moves = false;
-
+		/*
+			if ((ClientPrefs.noteSkin == 'Quants' || ClientPrefs.noteSkin == "QuantStep") && canQuant)
+			{
+				var beat = Conductor.getBeatInMeasure(strumTime);
+				if (prevNote != null && isSustainNote)
+					quant = prevNote.quant;
+				else
+					quant = getQuant(beat);
+			}
+		 */
 		x += (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
