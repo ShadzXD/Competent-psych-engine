@@ -20,7 +20,7 @@ class MusicBeatState extends FlxState
 	}
 
 	var _psychCameraInitialized:Bool = false;
-	static var transitionTime:Float = 0.4;
+	static var transitionTime:Float = 0.37;
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public static function getVariables()
 		return getState().variables;

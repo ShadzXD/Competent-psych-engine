@@ -1,6 +1,6 @@
 {
     "path_prefix": "funkin/",
     "antialiasing": true,
-    "rating_scale": 0.52,
-    "numbers_scale": 0.6
+    "rating_scale": 0.55,
+    "numbers_scale": 0.55
 }
