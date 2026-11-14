@@ -69,6 +69,7 @@ class StrumNote extends FlxSprite
 			skin = Note.defaultNoteSkin;
 
 		texture = skin; // Load texture and anims
+		defScale.set(scale.x, scale.y);
 
 		playAnim('static');
 	}

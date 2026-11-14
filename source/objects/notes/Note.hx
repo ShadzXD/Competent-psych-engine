@@ -213,6 +213,7 @@ class Note extends FlxSprite
 		if (isSustainNote && animation.curAnim != null && !animation.curAnim.name.endsWith('end'))
 		{
 			scale.y *= ratio;
+			defScale.y = scale.y;
 			updateHitbox();
 		}
 	}
@@ -571,6 +572,8 @@ class Note extends FlxSprite
 	override public function destroy()
 	{
 		super.destroy();
+		vec3Cache = null;
+		defScale.put();
 		_lastValidChecked = '';
 	}
 

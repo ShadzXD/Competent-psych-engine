@@ -525,7 +525,7 @@ class PlayState extends MusicBeatState
 		opponentStrumline.canBeHidden = true;
 		strumlines.add(opponentStrumline);
 
-		playerStrumline = new StrumLine(strumLineX, strumLineY, 1, ClientPrefs.data.downScroll);
+		playerStrumline = new StrumLine(strumLineX, strumLineY, 0, ClientPrefs.data.downScroll);
 		playerStrumline.cameras = [camHUD];
 		strumlines.add(playerStrumline);
 
@@ -1437,6 +1437,7 @@ class PlayState extends MusicBeatState
 				swagNote.gfNote = (section.gfSection && gottaHitNote == section.mustHitSection);
 				swagNote.animSuffix = isAlt ? "-alt" : "";
 				swagNote.mustPress = gottaHitNote;
+				swagNote.lane = swagNote.mustPress ? 0 : 1;
 				swagNote.sustainLength = holdLength;
 				swagNote.noteType = noteType;
 
@@ -1898,6 +1899,23 @@ class PlayState extends MusicBeatState
 					{
 						var fakeCrochet:Float = (60 / SONG.bpm) * 1000;
 						var i:Int = 0;
+
+						opponentStrumline.forEachAlive(function(strum:StrumNote)
+						{
+							var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 1, strum, [], strum.vec3Cache);
+							modManager.updateObject(curDecBeat, strum, pos, 1);
+							strum.x = pos.x + script_STRUMOffsets[strum.noteData].x;
+							strum.y = pos.y + script_STRUMOffsets[strum.noteData].y;
+						});
+
+						playerStrumline.forEachAlive(function(strum:StrumNote)
+						{
+							var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 0, strum, [], strum.vec3Cache);
+							modManager.updateObject(curDecBeat, strum, pos, 0);
+							strum.x = pos.x + script_STRUMOffsets[strum.noteData].x;
+							strum.y = pos.y + script_STRUMOffsets[strum.noteData].y;
+						});
+
 						while (i < notes.length)
 						{
 							var daNote:Note = notes.members[i];
@@ -1908,15 +1926,15 @@ class PlayState extends MusicBeatState
 								continue;
 							}
 
-							final visPos = -((Conductor.visualPosition - daNote.visualTime) * songSpeed);
-							final pos = modManager.getPos(daNote.strumTime, visPos, daNote.strumTime - Conductor.songPosition, curDecBeat, daNote.noteData,
-								daNote.lane, daNote, null, daNote.vec3Cache);
+							// final visPos = -((Conductor.visualPosition - daNote.visualTime) * songSpeed);
+							// final pos = modManager.getPos(daNote.strumTime, visPos, daNote.strumTime - Conductor.songPosition, curDecBeat, daNote.noteData,
+							// daNote.lane, daNote, null, daNote.vec3Cache);
 
-							modManager.updateObject(curDecBeat, daNote, pos, daNote.lane);
-							pos.x += daNote.offsetX;
-							pos.y += daNote.offsetY;
-							daNote.x = pos.x;
-							daNote.y = pos.y;
+							// modManager.updateObject(curDecBeat, daNote, pos, daNote.lane);
+							// pos.x += daNote.offsetX;
+							// pos.y += daNote.offsetY;
+							// daNote.x = pos.x;
+							// daNote.y = pos.y;
 
 							// todo: custom strumline support that redirects notes instantly, mayb
 							var curStrum:StrumLine = getStrumlineNote(daNote);
@@ -1965,24 +1983,6 @@ class PlayState extends MusicBeatState
 			}
 
 			checkEventNote();
-		}
-		if (startedCountdown)
-		{
-			opponentStrumline.forEachAlive(function(strum:StrumNote)
-			{
-				var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 1, strum, [], strum.vec3Cache);
-				modManager.updateObject(curDecBeat, strum, pos, 1);
-				strum.x = pos.x + script_STRUMOffsets[strum.noteData].x;
-				strum.y = pos.y + script_STRUMOffsets[strum.noteData].y;
-			});
-
-			playerStrumline.forEachAlive(function(strum:StrumNote)
-			{
-				var pos = modManager.getPos(0, 0, 0, curDecBeat, strum.noteData, 0, strum, [], strum.vec3Cache);
-				modManager.updateObject(curDecBeat, strum, pos, 0);
-				strum.x = pos.x + script_STRUMOffsets[strum.noteData].x;
-				strum.y = pos.y + script_STRUMOffsets[strum.noteData].y;
-			});
 		}
 
 		#if debug

@@ -58,7 +58,7 @@ class StrumLine extends FlxTypedGroup<StrumNote>
 
 	public function updateChars(oldChar:Character, newChar:Character)
 	{
-		if (oldChar == null || newChar == null)
+		if (oldChar == null || newChar == null || characters == null)
 			return;
 
 		for (i in 0...characters.length)
